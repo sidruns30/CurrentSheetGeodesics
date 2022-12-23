@@ -17,6 +17,7 @@ void GetConnectionNumerical(int metric_type, double X[NDIM], double conn[NDIM][N
 void GetConnectionAnalytic(int metric_type, double X[NDIM], double gamma[NDIM][NDIM][NDIM]);
 void TransformCoordinates(int metric_type_1, int metric_type_2, double X1[NDIM], double X2[NDIM]);
 void TransformFourVectors(int metric_type_1, int metric_type_2, double X1[NDIM], double T1[NDIM], double T2[NDIM]);
+double Detgcov(int metric_type, double X[NDIM]);
 
 void UpperToLower(int metric_type, double X[NDIM], double Ucon[NDIM], double Ucov[NDIM]);
 double delta(int i, int j);
