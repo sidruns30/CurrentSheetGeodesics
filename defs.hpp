@@ -11,8 +11,7 @@
 #include <numeric>
 #include <algorithm>
 #include <stdexcept>
-
-
+#include <unordered_map>
 
 #define NDIM (4)
 
@@ -25,6 +24,22 @@
 // Definitions that may be useful for the MKS coordinatees
 #define h_ks (0.9)
 #define R0_ks (0.)
+
+// Necessary for field calculations
+const bool idealMHD = true;
+
+// Define types
+typedef std::vector <double> ARRAY;
+typedef std::vector <std::vector <double>> ARRAY2D;
+
+extern ARRAY x,y,z;
+extern ARRAY rho,P,V1,V2,V3,B1,B2,B3,lfac,E1,E2,E3;
+extern ARRAY Bsqr_sim,bfluid0_sim,bfluid1_sim,bfluid2_sim,bfluid3_sim;
+extern ARRAY b2_sim, rMKS_sim, thetaMKS_sim;
+extern ARRAY2D COORDS;
+extern ARRAY2D PRIMS;
+
+extern std::unordered_map <std::string, int> iprim;
 
 struct photon
 {
@@ -42,9 +57,6 @@ bool Invert3Matrix(const double m[3][3], double minv[3][3]);
 void Multiply4Matrices(double a[NDIM][NDIM], double b[NDIM][NDIM], double c[NDIM][NDIM]);
 void Multiply3Matrices(double a[NDIM-1][NDIM-1], double b[NDIM-1][NDIM-1], double c[NDIM-1][NDIM-1]);
 void TransposeMatrix(double m[NDIM][NDIM], double minv[NDIM][NDIM]);
-
-
-//extern void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> data);
 
 void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> data);
 void print(std::string out);

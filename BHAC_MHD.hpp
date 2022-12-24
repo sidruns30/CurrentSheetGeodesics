@@ -1,32 +1,19 @@
+#ifndef DEF_HEAD
+#define DEF_HEAD (1)
+#include "defs.hpp"
+#endif
+
 #include "metric.hpp"
 #include "load_txt.hpp"
-#include <unordered_map>
 
 // The coords and primitives are given by the reader. The file only requires to be linked to the
 // metric file
 
-// Define a typedef
-typedef std::vector <std::vector <double>> ARRAY2D;
-typedef std::vector <double> ARRAY;
-
 // Check if MHD is ideal
-extern const int idealMHD;
-
-// Set the coordinates:
-extern ARRAY x, y, z;
-ARRAY2D COORDS = {x, y, z};
-
-// Set the primitives:
-extern ARRAY V1, V2, V3, B1, B2, B3, E1, E2, E3, lfac, P, rho;
-ARRAY2D PRIMS= {V1, V2, V3, B1, B2, B3, E1, E2, E3, lfac, P, rho};
-
-// Create a map to access PRIMS by array names
-std::unordered_map <std::string, int> iprim =   {{"V1",0}, {"V2",1},{"V3",2}, {"B1",3},{"B2",4}, {"B3",5},
-                                            {"E1",6}, {"E2",7},{"E3",8}, {"lfac",9},{"P",10}, {"rho",11}
-                                            }; 
+extern const bool idealMHD;
 
 // Set the other fluid quantities to be computed
-ARRAY   blfuid0, bfluid1, bfluid2, bfluid3,
+extern ARRAY   blfuid0, bfluid1, bfluid2, bfluid3,
         Bsqr, b2, u0, u1, u2, u3, beta, sigma,
         efluid0, efluid1, efluid2, efluid3, Esqr,
         e2, temp;

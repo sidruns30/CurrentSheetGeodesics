@@ -1,5 +1,4 @@
-#include "load_txt.hpp"
-#include "MKSmetric.hpp"
+#include "BHAC_MHD.hpp"
 #include "geodesic.hpp"
 
 int main()
@@ -12,8 +11,10 @@ int main()
 
     std::vector <size_t> i_sheet;
     std::vector <double> data[2*NDIM];
+    
     InitializeArrays(FNAME);
-    WriteCurrentSheetData(INFILE);
+    BHAC_MHD::GetU(u0, u1, u2, u3, COORDS, PRIMS);
+    //WriteCurrentSheetData(INFILE);
     
     /*
     // Step 1: Get Current Sheet

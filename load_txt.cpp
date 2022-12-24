@@ -1,11 +1,22 @@
 #include "load_txt.hpp"
 
+ARRAY x,y,z;
+ARRAY rho,P,V1,V2,V3,B1,B2,B3,lfac,E1,E2,E3;
+ARRAY Bsqr_sim,bfluid0_sim,bfluid1_sim,bfluid2_sim,bfluid3_sim;
+ARRAY b2_sim, rMKS_sim, thetaMKS_sim;
+
+ARRAY2D COORDS;
+ARRAY2D PRIMS;
+
 void InitializeArrays(std::string FILE_NAME)
 {
     std::ifstream infile(FILE_NAME);
     std::string line;
     int i, line_number = 0;
     double row_data[NVARS];
+
+    COORDS.clear();
+    PRIMS.clear();
 
     while (std::getline(infile, line))
     {
@@ -48,6 +59,25 @@ void InitializeArrays(std::string FILE_NAME)
         }
         line_number ++;
     }
+
+    // Push back data to global arrays
+    COORDS.push_back(x);
+    COORDS.push_back(y);
+    COORDS.push_back(z);
+
+    PRIMS.push_back(V1);
+    PRIMS.push_back(V2);
+    PRIMS.push_back(V3);
+    PRIMS.push_back(B1);
+    PRIMS.push_back(B2);
+    PRIMS.push_back(B3);
+    PRIMS.push_back(E1);
+    PRIMS.push_back(E2);
+    PRIMS.push_back(E3);
+    PRIMS.push_back(lfac);
+    PRIMS.push_back(P);
+    PRIMS.push_back(rho);
+
     int _vector_size = x.size();
     std::cout<<"Loaded the fluid data; number of cells = " << _vector_size << std::endl;
     return;
