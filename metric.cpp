@@ -361,6 +361,19 @@ void UpperToLower(int metric_type, double X[NDIM], double Ucon[NDIM], double Uco
     return;
 }
 
+// For the three matrices
+void UpperToLower3(int metric_type, double X[NDIM], double Ucon3[NDIM-1], double Ucov3[NDIM-1])
+{    
+    double gcov[NDIM][NDIM];
+    GcovFunc(metric_type, X, gcov);
+    // mul;tiplying with gamma_ij
+    Ucov3[0] = gcov[1][1]*Ucon3[0] + gcov[1][2]*Ucon3[1] + gcov[1][3]*Ucon3[2];
+    Ucov3[1] = gcov[2][1]*Ucon3[0] + gcov[2][2]*Ucon3[1] + gcov[2][3]*Ucon3[2];
+    Ucov3[2] = gcov[3][1]*Ucon3[0] + gcov[3][2]*Ucon3[1] + gcov[3][3]*Ucon3[2];
+    return;
+}
+
+
 // Solve quadratic equation for u^0 given the spatial components of the 4 velocity and the ideal MHD b field
 bool Get4Velocity(int metric_type, double X[NDIM], double ui_con[NDIM-1], double Ui_con[NDIM], double b_con[NDIM])
 {
@@ -760,6 +773,18 @@ double Detgcov(int metric_type, double X[NDIM])
     return det;
 }
 
+// Return the determinant of the 3 metric
+double Detgammacov(int metric_type, double X[NDIM])
+{
+    double gcon[NDIM][NDIM];
+    GconFunc(metric_type, X, gcon);
+    double alpha = sqrt(-1/gcon[0][0]); 
+
+    double detg = Detgcov(metric_type, X);
+    double detgamma = -detg/SQR(alpha);
+    return detgamma;
+}
+
 // Returns the sign of a variable
 double sgn(int x)
 {
@@ -778,26 +803,48 @@ double sgn(int x)
 }
 
 // Compute Levi-Civita permutation without metric given indices
-double _Eta(int a1, int a2, int a3, int a4)
+double _Eta4(int a1, int a2, int a3, int a4)
 {
     double lc = sgn(a2-a1)*sgn(a3-a2)*sgn(a3-a1)*sgn(a4-a3)*sgn(a4-a2)*sgn(a4-a1);
     return lc;
 }
 
+double _Eta3(int a1, int a2, int a3)
+{
+    double lc = sgn(a2-a1)*sgn(a3-a2)*sgn(a3-a1);
+    return lc;
+}
+
 // Get the anti symmetric symbol
-void GetEta(double ep[NDIM][NDIM][NDIM][NDIM])
+void GetEta4(double ep[NDIM][NDIM][NDIM][NDIM])
 {
     int i, j, k, l;
     for (i=0; i<NDIM; i++)
     {
         for (j=0; j<NDIM; j++)
         {
-            for (k=0; j<NDIM; k++)
+            for (k=0; k<NDIM; k++)
             {
                 for (l=0; l<NDIM; l++)
                 {
-                    ep[i][j][k][l] = _Eta(i,j,k,l);
+                    ep[i][j][k][l] = _Eta4(i,j,k,l);
                 }
+            }
+        }
+    }
+    return;
+}
+
+void GetEta3(double ep[NDIM-1][NDIM-1][NDIM-1])
+{
+    int i, j, k;
+    for (i=0; i<NDIM-1; i++)
+    {
+        for (j=0; j<NDIM-1; j++)
+        {
+            for (k=0; k<NDIM; k++)
+            {
+                ep[i][j][k] = _Eta3(i,j,k);
             }
         }
     }

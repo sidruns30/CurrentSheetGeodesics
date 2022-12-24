@@ -18,9 +18,14 @@ void GetConnectionAnalytic(int metric_type, double X[NDIM], double gamma[NDIM][N
 void TransformCoordinates(int metric_type_1, int metric_type_2, double X1[NDIM], double X2[NDIM]);
 void TransformFourVectors(int metric_type_1, int metric_type_2, double X1[NDIM], double T1[NDIM], double T2[NDIM]);
 double Detgcov(int metric_type, double X[NDIM]);
-void GetEta(double ep[NDIM][NDIM][NDIM][NDIM]);
+double Detgammacov(int metric_type, double X[NDIM]);
+
+void GetEta4(double ep[NDIM][NDIM][NDIM][NDIM]);
+void GetEta3(double ep[NDIM-1][NDIM-1][NDIM-1]);
 
 void UpperToLower(int metric_type, double X[NDIM], double Ucon[NDIM], double Ucov[NDIM]);
+void UpperToLower3(int metric_type, double X[NDIM], double Ucon[NDIM], double Ucov[NDIM]);
+
 double delta(int i, int j);
 void lower(double *ucon, double Gcov[NDIM][NDIM], double *ucov);
 bool Get4Velocity(int metric_type, double X[NDIM], double ui_con[NDIM-1], double Ui_con[NDIM], 
