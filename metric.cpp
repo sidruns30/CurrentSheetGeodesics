@@ -756,8 +756,50 @@ double Detgcov(int metric_type, double X[NDIM])
             g[0][3]*g[1][1]*g[2][2]*g[3][0] + g[0][3]*g[1][2]*g[2][1]*g[3][0]);
 
     det += (g[0][2]*g[1][1]*g[2][3]*g[3][0] + g[0][1]*g[1][3]*g[2][2]*g[3][0]);
+
     return det;
 }
 
-// Get the Levi-Civita symbol
-//void GetLeviCivita
+// Returns the sign of a variable
+double sgn(int x)
+{
+    if (x > 0)
+    {
+        return 1.;
+    }
+    else if (x < 0)
+    {
+        return -1.;
+    }
+    else
+    {
+        return 0.;
+    }
+}
+
+// Compute Levi-Civita permutation without metric given indices
+double _Eta(int a1, int a2, int a3, int a4)
+{
+    double lc = sgn(a2-a1)*sgn(a3-a2)*sgn(a3-a1)*sgn(a4-a3)*sgn(a4-a2)*sgn(a4-a1);
+    return lc;
+}
+
+// Get the anti symmetric symbol
+void GetEta(double ep[NDIM][NDIM][NDIM][NDIM])
+{
+    int i, j, k, l;
+    for (i=0; i<NDIM; i++)
+    {
+        for (j=0; j<NDIM; j++)
+        {
+            for (k=0; j<NDIM; k++)
+            {
+                for (l=0; l<NDIM; l++)
+                {
+                    ep[i][j][k][l] = _Eta(i,j,k,l);
+                }
+            }
+        }
+    }
+    return;
+}

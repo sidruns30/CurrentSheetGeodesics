@@ -18,6 +18,7 @@ void GetConnectionAnalytic(int metric_type, double X[NDIM], double gamma[NDIM][N
 void TransformCoordinates(int metric_type_1, int metric_type_2, double X1[NDIM], double X2[NDIM]);
 void TransformFourVectors(int metric_type_1, int metric_type_2, double X1[NDIM], double T1[NDIM], double T2[NDIM]);
 double Detgcov(int metric_type, double X[NDIM]);
+void GetEta(double ep[NDIM][NDIM][NDIM][NDIM]);
 
 void UpperToLower(int metric_type, double X[NDIM], double Ucon[NDIM], double Ucov[NDIM]);
 double delta(int i, int j);
