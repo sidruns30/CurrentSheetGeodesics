@@ -13,7 +13,10 @@ int main()
     std::vector <double> data[2*NDIM];
     
     InitializeArrays(FNAME);
-    BHAC_MHD::GetU(u0, u1, u2, u3, COORDS, PRIMS);
+    ARRAY Bsqr;
+    BHAC_MHD::GetBsqr(Bsqr, COORDS, PRIMS);
+    //BHAC_MHD::Getbfluid(blfuid0, bfluid1, bfluid2, bfluid3, COORDS, PRIMS);
+    //BHAC_MHD::GetU(u0, u1, u2, u3, COORDS, PRIMS);
     //WriteCurrentSheetData(INFILE);
     
     /*

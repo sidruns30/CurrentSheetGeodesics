@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <unordered_map>
+#include <omp.h>
 
 #define NDIM (4)
 
@@ -26,16 +27,15 @@
 #define R0_ks (0.)
 
 // Necessary for field calculations
-const bool idealMHD = true;
+const bool idealMHD = false;
 
 // Define types
 typedef std::vector <double> ARRAY;
 typedef std::vector <std::vector <double>> ARRAY2D;
 
-extern ARRAY x,y,z;
-extern ARRAY rho,P,V1,V2,V3,B1,B2,B3,lfac,E1,E2,E3;
 extern ARRAY Bsqr_sim,bfluid0_sim,bfluid1_sim,bfluid2_sim,bfluid3_sim;
-extern ARRAY b2_sim, rMKS_sim, thetaMKS_sim;
+extern ARRAY efluid0_sim,efluid1_sim,efluid2_sim,efluid3_sim;
+extern ARRAY b2_sim, e2_sim, rMKS_sim, thetaMKS_sim;;
 extern ARRAY2D COORDS;
 extern ARRAY2D PRIMS;
 

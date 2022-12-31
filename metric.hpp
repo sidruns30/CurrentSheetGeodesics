@@ -20,8 +20,8 @@ void TransformFourVectors(int metric_type_1, int metric_type_2, double X1[NDIM],
 double Detgcov(int metric_type, double X[NDIM]);
 double Detgammacov(int metric_type, double X[NDIM]);
 
-void GetEta4(double ep[NDIM][NDIM][NDIM][NDIM]);
-void GetEta3(double ep[NDIM-1][NDIM-1][NDIM-1]);
+double GetEta(int a1, int a2, int a3, int a4);
+double GetEta(int a1, int a2, int a3);
 
 void UpperToLower(int metric_type, double X[NDIM], double Ucon[NDIM], double Ucov[NDIM]);
 void UpperToLower3(int metric_type, double X[NDIM], double Ucon[NDIM], double Ucov[NDIM]);

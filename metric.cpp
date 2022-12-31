@@ -773,6 +773,7 @@ double Detgcov(int metric_type, double X[NDIM])
     return det;
 }
 
+
 // Return the determinant of the 3 metric
 double Detgammacov(int metric_type, double X[NDIM])
 {
@@ -803,50 +804,14 @@ double sgn(int x)
 }
 
 // Compute Levi-Civita permutation without metric given indices
-double _Eta4(int a1, int a2, int a3, int a4)
+double GetEta(int a1, int a2, int a3, int a4)
 {
     double lc = sgn(a2-a1)*sgn(a3-a2)*sgn(a3-a1)*sgn(a4-a3)*sgn(a4-a2)*sgn(a4-a1);
     return lc;
 }
 
-double _Eta3(int a1, int a2, int a3)
+double GetEta(int a1, int a2, int a3)
 {
     double lc = sgn(a2-a1)*sgn(a3-a2)*sgn(a3-a1);
     return lc;
-}
-
-// Get the anti symmetric symbol
-void GetEta4(double ep[NDIM][NDIM][NDIM][NDIM])
-{
-    int i, j, k, l;
-    for (i=0; i<NDIM; i++)
-    {
-        for (j=0; j<NDIM; j++)
-        {
-            for (k=0; k<NDIM; k++)
-            {
-                for (l=0; l<NDIM; l++)
-                {
-                    ep[i][j][k][l] = _Eta4(i,j,k,l);
-                }
-            }
-        }
-    }
-    return;
-}
-
-void GetEta3(double ep[NDIM-1][NDIM-1][NDIM-1])
-{
-    int i, j, k;
-    for (i=0; i<NDIM-1; i++)
-    {
-        for (j=0; j<NDIM-1; j++)
-        {
-            for (k=0; k<NDIM; k++)
-            {
-                ep[i][j][k] = _Eta3(i,j,k);
-            }
-        }
-    }
-    return;
 }

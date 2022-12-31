@@ -2,8 +2,7 @@
 
 // Make the map for primitives
 std::unordered_map <std::string, int> iprim =   {{"V1",0}, {"V2",1},{"V3",2}, {"B1",3},{"B2",4}, {"B3",5},
-                                        {"E1",6}, {"E2",7},{"E3",8}, {"lfac",9},{"P",10}, {"rho",11}
-                                        };
+                                        {"E1",6}, {"E2",7},{"E3",8}, {"lfac",9},{"P",10}, {"rho",11}};
 
 // Generic print (not sure where to place for now)
 void print(std::string out)
