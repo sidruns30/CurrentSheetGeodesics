@@ -3,7 +3,7 @@
 #include "defs.hpp"
 #endif
 
-const int NVARS = 26;
+const int NVARS = 28;
 
 
 void InitializeArrays(std::string FILE_NAME);

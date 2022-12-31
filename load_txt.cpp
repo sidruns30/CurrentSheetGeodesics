@@ -3,7 +3,7 @@
 // Global fields
 ARRAY Bsqr_sim,bfluid0_sim,bfluid1_sim,bfluid2_sim,bfluid3_sim;
 ARRAY efluid0_sim,efluid1_sim,efluid2_sim,efluid3_sim;
-ARRAY b2_sim, e2_sim;
+ARRAY b2_sim, e2_sim, rMKS_sim, thetaMKS_sim;
 
 ARRAY2D COORDS;
 ARRAY2D PRIMS;
@@ -24,7 +24,7 @@ void InitializeArrays(std::string FILE_NAME)
     while (std::getline(infile, line))
     {
         // The first two lines form the user header
-        if (line_number >=2)
+        if (line_number >=2 && line_number < 20000)
         {
             std::istringstream row(line);
             for (i=0; i<NVARS; i++)
@@ -60,7 +60,8 @@ void InitializeArrays(std::string FILE_NAME)
             efluid1_sim.push_back(row_data[23]);
             efluid2_sim.push_back(row_data[24]);
             efluid3_sim.push_back(row_data[25]);
-
+            rMKS_sim.push_back(row_data[26]);
+            thetaMKS_sim.push_back(row_data[27]);
             // Normally read fields, set to 0 for now
             if (idealMHD)
             {
