@@ -21,17 +21,19 @@ extern ARRAY   blfuid0, bfluid1, bfluid2, bfluid3,
 // Return global fluid quantities
 namespace BHAC_MHD
 {
-    void Getbfluid(ARRAY bfluid0, ARRAY bfluid1, ARRAY bfluid2, ARRAY bfluid3, ARRAY2D coords, ARRAY2D PRIMS);
-    void Getefluid(ARRAY efluid0, ARRAY efluid1, ARRAY efluid2, ARRAY efluid3, ARRAY2D coords, ARRAY2D PRIMS);
-    void GetU(ARRAY u0, ARRAY u1, ARRAY u2, ARRAY u3, ARRAY2D coords, ARRAY2D PRIMS);
+    void Getbfluid(ARRAY bfluid0, ARRAY bfluid1, ARRAY bfluid2, ARRAY bfluid3, 
+                    ARRAY u0, ARRAY u1, ARRAY u2, ARRAY u3, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void Getefluid(ARRAY efluid0, ARRAY efluid1, ARRAY efluid2, ARRAY efluid3, 
+                    ARRAY u0, ARRAY u1, ARRAY u2, ARRAY u3, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
 
-    void GetBsqr(ARRAY Bsqr, ARRAY2D coords, ARRAY2D PRIMS);
-    void GetEsqr(ARRAY Esqr, ARRAY2D coords, ARRAY2D PRIMS);
+    void GetBsqr(ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void GetEsqr(ARRAY Esqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
     
-    void Getb2(ARRAY b2, ARRAY2D coords, ARRAY2D PRIMS);
-    void Gete2(ARRAY e2, ARRAY2D coords, ARRAY2D PRIMS);
+    void Getb2(ARRAY b2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void Gete2(ARRAY e2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
     
-    void GetTemp(ARRAY temp, ARRAY2D coords, ARRAY2D PRIMS);    
-    void GetSigma(ARRAY sigma, ARRAY2D coords, ARRAY2D PRIMS);
-    void GetBeta(ARRAY beta, ARRAY2D coords, ARRAY2D PRIMS);
+    void GetTemp(ARRAY temp, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);    
+    void GetSigma(ARRAY sigma, ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void GetBeta(ARRAY beta, ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
 };
