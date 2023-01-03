@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <unordered_map>
+#include <bits/stdc++.h>
 #include <omp.h>
 
 #define NDIM (4)
@@ -60,7 +61,8 @@ void TransposeMatrix(double m[NDIM][NDIM], double minv[NDIM][NDIM]);
 
 void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> data);
 void print(std::string out);
-void printvar(std::string out, double var);
+template <typename T>
+void printvar(std::string out, T var);
 void print3(std::string name, double vec[NDIM]);
 void print4(std::string name, double vec[NDIM]);
 void print3M(std::string name, double mat[NDIM-1][NDIM-1]);
