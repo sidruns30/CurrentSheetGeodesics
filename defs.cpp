@@ -10,7 +10,8 @@ void print(std::string out)
     std::cout<<out<<"\n";
 }
 
-void printvar(std::string out, double var)
+template <typename T>
+void printvar(std::string out, T var)
 {
     std::cout<<out<<": "<<var<<"\n";
 }
