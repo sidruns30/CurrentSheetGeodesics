@@ -306,3 +306,14 @@ void TransposeMatrix(double m[NDIM][NDIM], double minv[NDIM][NDIM])
     }
     return;
 }
+
+// Get the sorted indices of a vector
+// Borrowed from https://stackoverflow.com/questions/1577475/c-sorting-and-keeping-track-of-indexes
+std::vector <size_t> sort_indices(const std::vector <double> &v)
+{
+    std::vector <size_t> indices(v.size());
+    // Works like np.arange
+    iota(indices.begin(), indices.end(), 0);
+    stable_sort(indices.begin(), indices.end(), [&v](size_t i1, size_t i2) {return v[i1] < v[i2]};);
+    return indices;
+}
