@@ -1,3 +1,7 @@
+#ifndef DEF_HEAD
+#define DEF_HEAD (1)
+#include "defs.hpp"
+#endif
 #include "getk.hpp"
 
 #define ETOL 1.e-3

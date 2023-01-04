@@ -143,7 +143,7 @@ void push_photon(int metric_type, double X[NDIM], double Kcon[NDIM], double dKco
 
     errE = fabs((E1 - (E0)) / (E0));
 
-    if (n < 7 && (errE > 1.e-4 || err > ETOL || isnan(err) || isinf(err))) 
+    if (n < 7 && (errE > 1.e-4 || err > ETOL || std::isnan(err) || std::isinf(err))) 
     {
         FAST_CPY(Xcpy, X);
         FAST_CPY(Kcpy, Kcon);
