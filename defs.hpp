@@ -47,11 +47,13 @@ typedef std::vector <double> ARRAY;
 typedef std::vector <ARRAY> ARRAY2D;
 typedef std::vector <ARRAY2D> ARRAY3D;
 
+/*
 extern ARRAY Bsqr_sim,bfluid0_sim,bfluid1_sim,bfluid2_sim,bfluid3_sim;
 extern ARRAY efluid0_sim,efluid1_sim,efluid2_sim,efluid3_sim;
 extern ARRAY b2_sim, e2_sim, rMKS_sim, thetaMKS_sim;;
 extern ARRAY2D COORDS;
 extern ARRAY2D PRIMS;
+*/
 
 extern ARRAY3D COORDS_BLOCKS;
 extern ARRAY3D PRIMS_BLOCKS;

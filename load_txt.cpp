@@ -8,7 +8,8 @@ ARRAY b2_sim, e2_sim, rMKS_sim, thetaMKS_sim;
 ARRAY2D COORDS;
 ARRAY2D PRIMS;
 
-void InitializeArrays(std::string FILE_NAME)
+void InitializeArrays(ARRAY2D &COORDS, ARRAY2D &PRIMS, 
+                    std::string FILE_NAME)
 {
     std::ifstream infile(FILE_NAME);
     std::string line;
@@ -24,7 +25,7 @@ void InitializeArrays(std::string FILE_NAME)
     while (std::getline(infile, line))
     {
         // The first two lines form the user header
-        if (line_number >=2 && line_number < 20000)
+        if (line_number >=2)
         {
             std::istringstream row(line);
             for (i=0; i<NVARS; i++)

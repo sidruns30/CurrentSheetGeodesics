@@ -3,20 +3,22 @@
 // Find all cells which have lie within a box_threshold of the cell
 // in the current sheet
 
-void GetClosebyCells(size_t ind, std::vector<size_t> &goodindices)
+void GetClosebyCells(size_t ind, std::vector<size_t> &goodindices,
+                    const ARRAY2D &COORDS_BLOCK)
 {
-    double xcoord = x[ind];
-    double ycoord = y[ind];
-    double zcoord = z[ind];
+    double xcoord = COORDS_BLOCK[0][ind];
+    double ycoord = COORDS_BLOCK[1][ind];
+    double zcoord = COORDS_BLOCK[2][ind];
     goodindices.clear();
     
     std::vector <size_t> _temp1, _temp2;
-    size_t i;
+    size_t i, j, k, N;
+    N = COORDS_BLOCK[0].size();
 
     // search along x
-    for (i=0; i<x.size(); i++)
+    for (i=0; i<N; i++)
     {
-        if (fabs(x[i] - xcoord) < BOX_THRESHOLD)
+        if (fabs(COORDS_BLOCK[0][i] - xcoord) < BOX_THRESHOLD)
         {
             _temp1.push_back(i);
         }
@@ -25,7 +27,7 @@ void GetClosebyCells(size_t ind, std::vector<size_t> &goodindices)
     // search along y
     for (i=0; i<_temp1.size(); i++)
     {
-        if (fabs(y[_temp1[i]] - ycoord) < BOX_THRESHOLD)
+        if (fabs(COORDS_BLOCK[1][_temp1[i]] - ycoord) < BOX_THRESHOLD)
         {
             _temp2.push_back(_temp1[i]);
         }
@@ -34,7 +36,7 @@ void GetClosebyCells(size_t ind, std::vector<size_t> &goodindices)
     // search along z
     for (i=0; i<_temp2.size(); i++)
     {
-        if (fabs(z[_temp2[i]] - zcoord) < BOX_THRESHOLD)
+        if (fabs(COORDS_BLOCK[2][_temp2[i]] - zcoord) < BOX_THRESHOLD)
         {
             goodindices.push_back(_temp2[i]);
         }
@@ -43,169 +45,209 @@ void GetClosebyCells(size_t ind, std::vector<size_t> &goodindices)
     return;
 }
 
-// Get indices of cells in the current sheet
-void GetCurrentSheet(std::vector <size_t> &i_sheet, bool store_data)
+// Return an array of tuples of indices where first index corresponds to
+// cell in the current sheet and the second index corresponds to the index 
+// of the nearest cell not in the current sheet, which has a high B field
+void FindCurrentSheet(std::vector <std::vector <size_t>> &indices, 
+    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
-    i_sheet.clear();
-    size_t i;
-    for (i=0; i<x.size(); i++)
+    // indices of cells containing the current sheet
+    std::vector <size_t> i_sheet;
+    size_t i, j, k, N;
+    N = PRIMS_BLOCK[iprim["rho"]].size();
+
+    ARRAY Bsqr;
+    BHAC_MHD::GetBsqr(Bsqr, COORDS_BLOCK, PRIMS_BLOCK);
+    
+    // Get all of the current sheet
+    for (i=0; i<N; i++)
     {
-        double sigma = Bsqr[i]/rho[i];
+        double sigma = Bsqr[i]/PRIMS_BLOCK[iprim["rho"]][i];
         if (sigma < SIGMA_THRESHOLD)
         {
             i_sheet.push_back(i);
         }
     }
 
-    std::cout<<"Number of cells in the current sheet = " << i_sheet.size();
-
-    // Write current sheet
-    if (store_data)
-    {
-        std::vector <int> indices; 
-        std::vector <double> xcpy;
-        std::vector <double> ycpy;
-        std::vector <double> zcpy;
-
-        for (i=0; i<i_sheet.size(); i++)
-        {
-            indices.push_back(i_sheet[i]);
-            xcpy.push_back(x[i_sheet[i]]);
-            ycpy.push_back(y[i_sheet[i]]);
-            zcpy.push_back(z[i_sheet[i]]);
-        }
-
-        std::ofstream file("fullsheet.txt");
-        
-        if (file.is_open())
-        {
-            for (i=0; i<xcpy.size(); i++)
-            {
-                file << indices[i] << ", " << xcpy[i] << ", "<< ycpy[i] << ", "<< zcpy[i] << "\n";
-            }
-            file.close();
-        }
-    }
-    return;
-}
-
-
-// Write current sheet data (current sheet coordinates and b field values) to file
-void WriteCurrentSheetData(std::string Outfile)
-{
-    std::vector <size_t> i_sheet;
-    GetCurrentSheet(i_sheet, false);
-
-    std::vector <int> indices;
-    std::vector <double> xcpy;
-    std::vector <double> ycpy;
-    std::vector <double> zcpy;
-    std::vector <double> xfldcpy;
-    std::vector <double> yfldcpy;
-    std::vector <double> zfldcpy;
-    std::vector <double> u1cpy;
-    std::vector <double> u2cpy;
-    std::vector <double> u3cpy;
-    std::vector <double> bsqrcpy;
-    std::vector <double> bfluid0cpy;
-    std::vector <double> bfluid1cpy;
-    std::vector <double> bfluid2cpy;
-    std::vector <double> bfluid3cpy;
-    std::vector <double> lfaccpy;
-    std::vector <double> B2cpy;
-    std::vector <double> thetaMKScpy;
-    std::vector <double> rMKScpy;
-    size_t i;
-
-    for (i=0; i<i_sheet.size(); i++)
+    indices.clear();
+    // Now find upstream magnetic field cells close to the current sheet cells
+    N = i_sheet.size();
+    for (i=0; i<N; i++)
     {
         std::vector<size_t> closecells;
-        size_t k, imax;
-        double bsqr_max=0.;
-        std::vector<double> x_k;
-        
-        GetClosebyCells(i_sheet[i], closecells);
+        size_t imax;
+        double x, y, z, r, bsqr_max=0.;
+        bool flag = false;
+
+        x = COORDS_BLOCK[0][i_sheet[i]];
+        y = COORDS_BLOCK[1][i_sheet[i]];
+        z = COORDS_BLOCK[2][i_sheet[i]];
+
+        r = sqrt(SQR(x) + SQR(y) + SQR(z));
+
+        GetClosebyCells(i_sheet[i], closecells, COORDS_BLOCK);
         for (k=0; k<closecells.size(); k++)
         {
-            if (Bsqr[closecells[k]] > BSQR_THRESHOLD)
+            if (Bsqr[closecells[k]] > BSQR_THRESHOLD/r)
             {
                 if (Bsqr[closecells[k]] > bsqr_max)
                 {
                     bsqr_max = Bsqr[closecells[k]];
                     imax = closecells[k];
+                    flag = true;
                 }
             }
         }
-        // imax: index of the cell in vicinty with high Bsqr (not in current sheet)
-        // i_sheet[i]: index of the corresponding cell in the current sheet
-        if (bsqr_max != 0.)
-        {
-            indices.push_back(i_sheet[i]);
-            xcpy.push_back(x[i_sheet[i]]);
-            ycpy.push_back(y[i_sheet[i]]);
-            zcpy.push_back(z[i_sheet[i]]);
-            xfldcpy.push_back(x[imax]);
-            yfldcpy.push_back(y[imax]);
-            zfldcpy.push_back(z[imax]);
-            u1cpy.push_back(u1[imax]);
-            u2cpy.push_back(u2[imax]);
-            u3cpy.push_back(u3[imax]);
-            bsqrcpy.push_back(Bsqr[imax]);
-            bfluid0cpy.push_back(bfluid0[imax]);
-            bfluid1cpy.push_back(bfluid1[imax]);
-            bfluid2cpy.push_back(bfluid2[imax]);
-            bfluid3cpy.push_back(bfluid3[imax]);
-            lfaccpy.push_back(lfac[imax]);
-            B2cpy.push_back(B2[imax]);
-            thetaMKScpy.push_back(thetaMKS[imax]);
-            rMKScpy.push_back(rMKS[imax]);
-        }
-    }
 
-    std::cout<<"Number of cells in the outer sheet: "<<xcpy.size()<<std::endl;
-    std::ofstream file(Outfile);
-    
-    if (file.is_open())
-    {
-        for (i=0; i<xcpy.size(); i++)
+        if (flag)
         {
-            file << indices[i] << ", " << xcpy[i] << ", "<< ycpy[i] << ", "<< zcpy[i] << ", "
-                << xfldcpy[i] << ", " << yfldcpy[i] << ", " << zfldcpy[i] << ", " <<
-                u1cpy[i] << ", " << u2cpy[i] << ", " << u3cpy[i] << ", " << bsqrcpy[i] << 
-                ", " << bfluid0cpy[i] << ", " << bfluid1cpy[i] << ", " << bfluid2cpy[i] <<
-                ", " << bfluid3cpy[i] << ", "<< lfaccpy[i]<< ", "<< B2cpy[i] << 
-                ", "<<thetaMKScpy[i]<<", "<<rMKScpy[i]<< "\n";
+            std::vector <size_t> temp = {i_sheet[i], imax};
+            indices.push_back(temp);
         }
-        file.close();
-    }
-
+    }    
     return;
 }
 
-void ReadSheetDataFromFile (std::string FILE_NAME, std::vector <double> data[NVARS_SHEET])
+// Returns the wavevector in MKS
+void Initialize_XK( ARRAY &X_K, double _x, double _y, double _z, 
+                                    double _u0, double _u1, double _u2, double _u3,
+                                    double _bfluid0, double _bfluid1, double _bfluid2, double _bfluid3,
+                                    int mode)
 {
-    std::ifstream infile(FILE_NAME);
-    std::string line;
-    int i, line_number = 0;
-    // Stored arrays are: ind, x, y, z, xs, ys, zs, u1, u2, u3, bsq, bfld0, bfld1, bfld2, bfld3, lfac, B2
-    double row_data[NVARS_SHEET];
-    for (i=0; i<NVARS_SHEET; i++)
+    // mode = {0, 1, 2} for parallel, antiparallel and perpendicular wavevectors
+    size_t i,j;
+
+    // MKS
+    int metric_type = 3;
+
+    // Get MKS coordinates
+    double XKS[NDIM], XMKS[NDIM];
+    CartToKS(_x, _y, _z, XKS);
+    TransformCoordinates(2, 3, XKS, XMKS);
+
+    // Get both upper and lower metrics
+    double gcov[NDIM][NDIM];
+    double gcon[NDIM][NDIM];
+
+    GcovFunc(metric_type, XMKS, gcov);
+    GconFunc(metric_type, XMKS, gcon);
+
+
+    // Input fields and 4 velocity
+    double U_con_MKS[NDIM] = {_u0, _u1, _u2, _u3},
+            b_con[NDIM] = {_bfluid0, _bfluid1, _bfluid2, _bfluid3};
+
+    // Make the tetrad
+    double Econ[NDIM][NDIM];
+    double Ecov[NDIM][NDIM];
+    make_tetrad(U_con_MKS, gcov, Econ, Ecov);
+
+
+    double b_con_tetrad[NDIM];
+    // Get bfluid in the fluid drame
+    coordinate_to_tetrad(Ecov, b_con, b_con_tetrad);
+
+    // The photon wavevector in MKS
+    double k_con_tetrad[NDIM], k_con_MKS[NDIM], k_cov_tetrad[NDIM], k_cov_MKS[NDIM];
+    // parallel
+    if (mode == 0)
     {
-        data[i].clear();
-    }
-    while (std::getline(infile, line))
-    {
-        std::istringstream row(line);
-        std::string row_s;
-        for (i=0; i<NVARS_SHEET; i++)
+        for (i=1;i<NDIM;i++)
         {
-            row >> row_s;
-            row_data[i] = std::stod(row_s);
-            data[i].push_back(row_data[i]);
+            k_con_tetrad[i] = b_con_tetrad[i];
         }
+    }
+    // anti parallel
+    else if (mode == 1)
+    {
+        for (i=1; i<NDIM;i++)
+        {
+            k_con_tetrad[i] = -b_con_tetrad[i];
+        }
+    }
+
+    // perpendicular
+    else if (mode == 2)
+    {
+        k_con_tetrad[1] = 1.;
+        k_con_tetrad[2] = 0.;
+        k_con_tetrad[3] = -b_con_tetrad[1]/b_con_tetrad[3];
+    }
+
+    // Normalize the wavevector
+    k_con_tetrad[0] = sqrt(SQR(k_con_tetrad[1]) + SQR(k_con_tetrad[2]) + SQR(k_con_tetrad[3]));
+
+    // Get the coordinate frame
+    tetrad_to_coordinate(Econ, k_con_tetrad, k_con_MKS);
+
+    // Write to full vector
+    X_K.clear();
+    for (i=0; i<NDIM; i++)
+    {
+        X_K.push_back(XMKS[i]);
+    }
+    for (i=0; i<NDIM; i++)
+    {
+        X_K.push_back(k_con_MKS[i]);
+    }
+
+    return;
+}
+
+// Return an array of arrays X_k that contains the initial position and 
+// wavevector of the photon. Needs the indices of the cells in the current
+// sheet as well as the indices of the upstream cells
+void ConstructWavevectors(ARRAY2D &X_K, int mode, 
+                        const std::vector <std::vector <size_t>> &indices, 
+                        ARRAY2D &COORDS_BLOCK, ARRAY2D &PRIMS_BLOCK)
+{
+
+    // First get the bfluid of all the cells
+    ARRAY u0, u1, u2, u3, bfluid0, bfluid1, bfluid2, bfluid3;
+    BHAC_MHD::Getbfluid(bfluid0, bfluid1, bfluid2, bfluid3, 
+                        u0, u1, u2, u3, COORDS_BLOCK, PRIMS_BLOCK);
+    
+    // Now iterate through the cells of the current sheet to get
+    // wavevectors of all the cells
+    size_t i, j, N;
+    N = indices[0].size();
+
+    // Clear input array
+    X_K.clear();
+
+    for (i=0; i<N; i++)
+    {
+        size_t i_sheet, i_upstream;
+        i_sheet = indices[i][0];
+        i_upstream = indices[i][1];
+
+        // Use magnetic fields and 4 velocity of the upstream cells
+        // but the position vector of the current sheet cell
+        double _x, _y, _z;
+        double _u0, _u1, _u2, _u3;
+        double _bfluid0, _bfluid1, _bfluid2, _bfluid3;
+        _x = COORDS_BLOCK[0][i_sheet];
+        _y = COORDS_BLOCK[1][i_sheet];
+        _z = COORDS_BLOCK[2][i_sheet];
+        _u0 = u0[i_upstream];
+        _u1 = u1[i_upstream];
+        _u2 = u2[i_upstream];
+        _u3 = u3[i_upstream];
+        _bfluid0 = bfluid0[i_upstream];
+        _bfluid1 = bfluid1[i_upstream];
+        _bfluid2 = bfluid2[i_upstream];
+        _bfluid3 = bfluid3[i_upstream];
+
+        ARRAY X_K_local;
+        Initialize_XK(X_K_local, _x, _y, _z, _u0, _u1, _u2, _u3, _bfluid0, 
+                        _bfluid1, _bfluid2, _bfluid3, mode);
+        X_K.push_back(X_K_local);
     }
     return;
 }
+
+
+/*
 
 
 // We are doing everything in MKS (i.e. metric_type = 3)
@@ -387,3 +429,4 @@ void WriteX_kToFile(std::string Infile, std::string OutName)
 
     return;
 }
+*/

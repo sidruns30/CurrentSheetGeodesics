@@ -403,4 +403,46 @@ void T_3CartTo3MKS(double T3Cart[NDIM-1], double T3MKS[NDIM-1], double XMKS[NDIM
     return;
 }
 
+// Try to invert using the second way (non transcedental way)
+void T_3CartTo3MKS_v2(double T3Cart[NDIM-1], double T3MKS[NDIM-1], double XMKS[NDIM])
+{
+    double J[NDIM-1][NDIM-1];
+    double es = exp(XMKS[1]);
+    double vtheta = XMKS[2];
+    double phi = XMKS[3];
+    
+    // This is basically theta KS
+    double alpha = vtheta + 0.5 * h_ks * sin(2 * vtheta);
+    double dvthdth = (1 + 2 * h_ks + 12 * h_ks * (SQR(XMKS[2]/PI) - XMKS[2]/PI));
 
+    // Similarly this is R_ks
+    double r = R0_ks + es;
+
+    J[0][0] = es * cos(phi) * sin(alpha);
+    J[1][0] = es * sin(phi) * sin(alpha);
+    J[2][0] = es * cos(alpha);
+
+    J[0][1] = r * cos(phi) * cos(alpha) * dvthdth;
+    J[1][1] = r * sin(phi) * cos(alpha) * dvthdth;
+    J[2][1] = -r * sin(alpha) * dvthdth;
+    
+    J[0][2] = -r * sin(phi) * sin(alpha);
+    J[1][2] = r * cos(phi) * sin(alpha);
+    J[2][2] = 0;
+
+    // Now invert J
+    double Jinv[NDIM-1][NDIM-1];
+    bool success = Invert3Matrix(J, Jinv);
+
+    if (!success)
+    {
+        std::cout<<"Failed to invert matrix \n";
+        return;
+    }
+
+    T3MKS[0] = Jinv[0][0] * T3Cart[0] + Jinv[0][1] * T3Cart[1] + Jinv[0][2] * T3Cart[2];
+    T3MKS[1] = Jinv[1][0] * T3Cart[0] + Jinv[1][1] * T3Cart[1] + Jinv[1][2] * T3Cart[2];
+    T3MKS[2] = Jinv[2][0] * T3Cart[0] + Jinv[2][1] * T3Cart[1] + Jinv[2][2] * T3Cart[2];
+
+    return;
+}

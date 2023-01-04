@@ -15,7 +15,6 @@
         efluid0, efluid1, efluid2, efluid3, Esqr,
         e2, temp;
 */
-bool FourVelInit = false;
 
 
 void BHAC_MHD::Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &bfluid3, 
@@ -32,7 +31,7 @@ void BHAC_MHD::Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &
     bfluid3.clear();
 
     // Need to call this after 4 velocity (sets MKS u)
-    if (!FourVelInit)
+    if (u0.size() < N)
     {
         BHAC_MHD::GetU(u0, u1, u2, u3, COORDS_BLOCK, PRIMS_BLOCK);
     }
@@ -155,7 +154,7 @@ void BHAC_MHD::Getefluid(ARRAY &efluid0, ARRAY &efluid1, ARRAY &efluid2, ARRAY &
     efluid3.clear();
 
     // Need to call this after 4 velocity (sets MKS u)
-    if (!FourVelInit)
+    if (u0.size() < N)
     {
         BHAC_MHD::GetU(u0, u1, u2, u3, COORDS_BLOCK, PRIMS_BLOCK);
     }
@@ -345,17 +344,6 @@ void BHAC_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3,
         root1 = (-B + sqrt(SQR(B) - 4*A*C))/(2*A);
         root2 = (-B - sqrt(SQR(B) - 4*A*C))/(2*A);
 
-        // Check norm with B field
-        double b_sim[NDIM] = {bfluid0_sim[i], bfluid1_sim[i], bfluid2_sim[i], bfluid3_sim[i]};
-        double b_sim_cov[NDIM];
-        double norm = 0.;
-        UpperToLower(3, XMKS, b_sim, b_sim_cov);
-
-        for (j=1; j<NDIM; j++)
-        {
-            norm += b_sim_cov[j] * U[j];
-        }
-
         // Pick the root that matches the lorentz factor within a tolerance
         double tol = 1.e-3;
         U[0] = (fabs(1 - root1*alpha/lfac) < fabs(1 - root2*alpha/lfac)) ? root1 : root2;
@@ -373,7 +361,6 @@ void BHAC_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3,
         u3.push_back(U[3]);
         
     }
-    FourVelInit = true;
     if (Nbad > 0)
     {
         std::cout<<"WARNING: 4 velocity lfac does not match simulation lfac for "<<

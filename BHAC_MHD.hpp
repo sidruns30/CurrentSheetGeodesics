@@ -4,7 +4,6 @@
 #endif
 
 #include "metric.hpp"
-#include "load_txt.hpp"
 
 // To do: make the function arguments to be const &ARRAY
 

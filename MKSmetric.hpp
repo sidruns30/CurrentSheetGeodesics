@@ -26,6 +26,8 @@ void T_MKSToKS_v2(double TMKS[NDIM], double TKS[NDIM], double XMKS[NDIM]);
 
 void T_3MKSTo3Cart(double T3MKS[NDIM-1], double T3Cart[NDIM-1], double XMKS[NDIM]);
 void T_3CartTo3MKS(double T3Cart[NDIM-1], double T3MKS[NDIM-1], double XMKS[NDIM]);
+void T_3CartTo3MKS_v2(double T3Cart[NDIM-1], double T3MKS[NDIM-1], double XMKS[NDIM]);
+
 
 extern bool Invert3Matrix(const double m[3][3], double minv[3][3]);
 extern void Multiply3Matrices(double a[NDIM-1][NDIM-1], double b[NDIM-1][NDIM-1], double c[NDIM-1][NDIM-1]);

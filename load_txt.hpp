@@ -6,5 +6,4 @@
 const int NVARS = 28;
 
 
-void InitializeArrays(std::string FILE_NAME);
-extern void WriteVectorToFile(std::string fname, ARRAY2D data);
+void InitializeArrays(ARRAY2D &COORDS, ARRAY2D &PRIMS, std::string FILE_NAME);
