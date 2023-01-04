@@ -34,6 +34,10 @@
 #define h_ks (0.9)
 #define R0_ks (0.)
 
+// Variables useful to find the current sheet
+const double SIGMA_THRESHOLD = 3.;
+const double BOX_THRESHOLD = 0.01;
+const double BSQR_THRESHOLD = 10.;
 
 // Necessary for field calculations
 const bool idealMHD = false;
