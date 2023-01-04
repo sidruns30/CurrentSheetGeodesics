@@ -10,11 +10,6 @@ void print(std::string out)
     std::cout<<out<<"\n";
 }
 
-template <typename T>
-void printvar(std::string out, T var)
-{
-    std::cout<<out<<": "<<var<<"\n";
-}
 // Print 3 vector
 void print3(std::string name, double vec[NDIM-1])
 {
@@ -60,7 +55,7 @@ void print4M(std::string name, double mat[NDIM][NDIM])
 }
 
 // Input vector referenced as data[row_id, col_id]
-void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> data)
+void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> &data)
 {
     size_t nrows, ncols;
     nrows = data.size();
@@ -314,6 +309,6 @@ std::vector <size_t> sort_indices(const std::vector <double> &v)
     std::vector <size_t> indices(v.size());
     // Works like np.arange
     iota(indices.begin(), indices.end(), 0);
-    stable_sort(indices.begin(), indices.end(), [&v](size_t i1, size_t i2) {return v[i1] < v[i2]};);
+    stable_sort(indices.begin(), indices.end(), [&v](size_t i1, size_t i2) {return v[i1] < v[i2];});
     return indices;
 }

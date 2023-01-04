@@ -15,6 +15,13 @@
 #include <bits/stdc++.h>
 #include <omp.h>
 
+// OpenMP support
+#if defined(_OPENMP)
+    const int maxthreads = omp_get_max_threads();
+#else 
+    const int maxthreads = 1;
+#endif
+
 #define NDIM (4)
 
 // Definitions appropriate for the metric
@@ -27,18 +34,24 @@
 #define h_ks (0.9)
 #define R0_ks (0.)
 
+
 // Necessary for field calculations
 const bool idealMHD = false;
 
 // Define types
 typedef std::vector <double> ARRAY;
-typedef std::vector <std::vector <double>> ARRAY2D;
+typedef std::vector <ARRAY> ARRAY2D;
+typedef std::vector <ARRAY2D> ARRAY3D;
 
 extern ARRAY Bsqr_sim,bfluid0_sim,bfluid1_sim,bfluid2_sim,bfluid3_sim;
 extern ARRAY efluid0_sim,efluid1_sim,efluid2_sim,efluid3_sim;
 extern ARRAY b2_sim, e2_sim, rMKS_sim, thetaMKS_sim;;
 extern ARRAY2D COORDS;
 extern ARRAY2D PRIMS;
+
+extern ARRAY3D COORDS_BLOCKS;
+extern ARRAY3D PRIMS_BLOCKS;
+
 
 extern std::unordered_map <std::string, int> iprim;
 
@@ -58,11 +71,20 @@ bool Invert3Matrix(const double m[3][3], double minv[3][3]);
 void Multiply4Matrices(double a[NDIM][NDIM], double b[NDIM][NDIM], double c[NDIM][NDIM]);
 void Multiply3Matrices(double a[NDIM-1][NDIM-1], double b[NDIM-1][NDIM-1], double c[NDIM-1][NDIM-1]);
 void TransposeMatrix(double m[NDIM][NDIM], double minv[NDIM][NDIM]);
+std::vector <size_t> sort_indices(const std::vector <double> &v);
 
-void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> data);
-void print(std::string out);
+
+void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> &data);
+
+
+// For debugging
 template <typename T>
-void printvar(std::string out, T var);
+void printvar(std::string out, T var)
+{
+    std::cout<<out<<": "<<var<<"\n";
+}
+
+void print(std::string out);
 void print3(std::string name, double vec[NDIM]);
 void print4(std::string name, double vec[NDIM]);
 void print3M(std::string name, double mat[NDIM-1][NDIM-1]);

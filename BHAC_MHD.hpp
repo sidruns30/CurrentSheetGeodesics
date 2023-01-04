@@ -6,6 +6,8 @@
 #include "metric.hpp"
 #include "load_txt.hpp"
 
+// To do: make the function arguments to be const &ARRAY
+
 // The coords and primitives are given by the reader. The file only requires to be linked to the
 // metric file
 
@@ -21,19 +23,23 @@ extern ARRAY   blfuid0, bfluid1, bfluid2, bfluid3,
 // Return global fluid quantities
 namespace BHAC_MHD
 {
-    void Getbfluid(ARRAY bfluid0, ARRAY bfluid1, ARRAY bfluid2, ARRAY bfluid3, 
-                    ARRAY u0, ARRAY u1, ARRAY u2, ARRAY u3, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
-    void Getefluid(ARRAY efluid0, ARRAY efluid1, ARRAY efluid2, ARRAY efluid3, 
-                    ARRAY u0, ARRAY u1, ARRAY u2, ARRAY u3, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
-    void GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &bfluid3, 
+                    ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, 
+                    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
 
-    void GetBsqr(ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
-    void GetEsqr(ARRAY Esqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void Getefluid(ARRAY &efluid0, ARRAY &efluid1, ARRAY &efluid2, ARRAY &efluid3, 
+                    ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, 
+                    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
+    void GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, 
+                    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
+
+    void GetBsqr(ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
+    void GetEsqr(ARRAY &Esqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
     
-    void Getb2(ARRAY b2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
-    void Gete2(ARRAY e2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void Getb2(ARRAY &b2, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
+    void Gete2(ARRAY &e2, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
     
-    void GetTemp(ARRAY temp, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);    
-    void GetSigma(ARRAY sigma, ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
-    void GetBeta(ARRAY beta, ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK);
+    void GetTemp(ARRAY &temp, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);    
+    void GetSigma(ARRAY &sigma, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
+    void GetBeta(ARRAY &beta, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
 };

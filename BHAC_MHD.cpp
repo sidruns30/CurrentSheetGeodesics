@@ -18,9 +18,9 @@
 bool FourVelInit = false;
 
 
-void BHAC_MHD::Getbfluid(ARRAY bfluid0, ARRAY bfluid1, ARRAY bfluid2, ARRAY bfluid3, 
-                        ARRAY u0, ARRAY u1, ARRAY u2, ARRAY u3, 
-                        ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &bfluid3, 
+                    ARRAY &u0,  ARRAY &u1,  ARRAY &u2, ARRAY &u3, 
+                    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, N;
     int j, k, l, m, n;
@@ -141,9 +141,9 @@ void BHAC_MHD::Getbfluid(ARRAY bfluid0, ARRAY bfluid1, ARRAY bfluid2, ARRAY bflu
     return;
 }
 
-void BHAC_MHD::Getefluid(ARRAY efluid0, ARRAY efluid1, ARRAY efluid2, ARRAY efluid3, 
-                        ARRAY u0, ARRAY u1, ARRAY u2, ARRAY u3, 
-                        ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::Getefluid(ARRAY &efluid0, ARRAY &efluid1, ARRAY &efluid2, ARRAY &efluid3, 
+                    ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, 
+                    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, N;
     int j, k, l, m, n;
@@ -263,7 +263,8 @@ void BHAC_MHD::Getefluid(ARRAY efluid0, ARRAY efluid1, ARRAY efluid2, ARRAY eflu
 }
 
 // Get the 4 velocity arrays
-void BHAC_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, 
+                    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {   
     size_t i,j,k,N;
     N = COORDS_BLOCK[0].size();
@@ -383,7 +384,7 @@ void BHAC_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, ARRAY2D COORDS_B
     return;
 }
 
-void BHAC_MHD::GetBsqr(ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::GetBsqr(ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, j, N;
     N = COORDS_BLOCK[0].size();
@@ -425,7 +426,7 @@ void BHAC_MHD::GetBsqr(ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
     return;
 }
     
-void BHAC_MHD::GetEsqr(ARRAY Esqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::GetEsqr(ARRAY &Esqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, j, N;
     N = COORDS_BLOCK[0].size();
@@ -469,7 +470,7 @@ void BHAC_MHD::GetEsqr(ARRAY Esqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
     return;
 }
     
-void BHAC_MHD::Getb2(ARRAY b2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::Getb2(ARRAY &b2, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, N;
     N = COORDS_BLOCK[0].size();
@@ -481,7 +482,7 @@ void BHAC_MHD::Getb2(ARRAY b2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
     return;
 }
 
-void BHAC_MHD::Gete2(ARRAY e2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::Gete2(ARRAY &e2, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, N;
     N = COORDS_BLOCK[0].size();
@@ -493,7 +494,7 @@ void BHAC_MHD::Gete2(ARRAY e2, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
     return;
 }
     
-void BHAC_MHD::GetTemp(ARRAY temp, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::GetTemp(ARRAY &temp, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, N;
     N = COORDS_BLOCK[0].size();
@@ -507,7 +508,7 @@ void BHAC_MHD::GetTemp(ARRAY temp, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
     return;
 }
 
-void BHAC_MHD::GetSigma(ARRAY sigma, ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::GetSigma(ARRAY &sigma, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, N;
     N = COORDS_BLOCK[0].size();
@@ -528,7 +529,7 @@ void BHAC_MHD::GetSigma(ARRAY sigma, ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D P
     return;
 }
 
-void BHAC_MHD::GetBeta(ARRAY beta, ARRAY Bsqr, ARRAY2D COORDS_BLOCK, ARRAY2D PRIMS_BLOCK)
+void BHAC_MHD::GetBeta(ARRAY &beta, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
 {
     size_t i, N;
     N = COORDS_BLOCK[0].size();
