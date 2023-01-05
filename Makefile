@@ -1,0 +1,2 @@
+all: metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp main.cpp
+	g++-12 -o exec -O2 -std=c++17 metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp main.cpp -fopenmp
