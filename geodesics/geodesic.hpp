@@ -5,3 +5,4 @@
 #include "../fluid/getk.hpp"
 
 void GetGeodesics(ARRAY3D &gdscs, const ARRAY2D &X_K);
+void WriteGeodesics(const ARRAY3D &gdscs, const std::string fname);

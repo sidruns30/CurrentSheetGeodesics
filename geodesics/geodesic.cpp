@@ -216,3 +216,26 @@ void GetGeodesics(ARRAY3D &gdscs, const ARRAY2D &X_K)
     }
     return;
 }
+
+// Input vector referenced as data[row_id, col_id]
+void WriteGeodesics(const ARRAY3D &gdscs, const std::string fname)
+{
+    // Make a 2D vector for the geodesics, 
+    ARRAY2D all_gdscs;
+    size_t i_gdsc, i_ray, M, N=gdscs.size();
+
+    for (i_gdsc=0; i_gdsc<N; i_gdsc++)
+    {
+        M = gdscs[i_gdsc].size();
+        for (i_ray=0; i_ray<M; i_ray++)
+        {
+            ARRAY pos = gdscs[i_gdsc][i_ray];
+            pos.push_back((double)i_gdsc);
+            all_gdscs.push_back(pos);
+        }
+    }
+
+    WriteVectorToFile(fname, all_gdscs);
+
+    return;
+}
