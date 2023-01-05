@@ -1,5 +1,6 @@
 #include "geodesic.hpp"
 
+// In KS coordinates
 double startx[NDIM] = {0., 1., 0., 0.};
 double stopx[NDIM] = {0., 10., 0., 0.};
 
@@ -35,24 +36,6 @@ void init_dKdlam(int metric_type, double X[], double Kcon[], double dK[])
 
 
   GetConnectionAnalytic(metric_type, X, lconn);
-  /*GetConnectionNumerical(metric_type, X, lconn_v2);
-
-  int a,b,c;
-  double diff[NDIM];
-  for (a=0;a<NDIM;a++)
-  {
-    for (b=0;b<NDIM;b++)
-    {
-        for (c=0;c<NDIM;c++)
-        {
-            diff[c] = lconn[a][b][c] - lconn_v2[a][b][c];
-        }
-        print4("numerical", lconn_v2[a][b]);
-        print4("analytical", lconn[a][b]);
-        print4("diff", diff);
-    }
-  }
-*/
 
   for (k = 0; k < 4; k++) {
 
@@ -82,11 +65,8 @@ void push_photon(int metric_type, double X[NDIM], double Kcon[NDIM], double dKco
     double dl_2, err, errE;
     int i, k, iter;
     
-    // NOTE TO SELF: Ask Jordy about commenting out this section of the code
-    //#if MKS
     if (X[1] < startx[1])
         return;
-    //#endif
 
     FAST_CPY(X, Xcpy);
     FAST_CPY(Kcon, Kcpy);
@@ -157,22 +137,21 @@ void push_photon(int metric_type, double X[NDIM], double Kcon[NDIM], double dKco
 }
 
 // The main geodesic integrator - saves the orbit of the photon every 0.01 Rg
-std::vector <std::vector <double>> GetGeodesic(int metric_type, double X[NDIM], double K[NDIM])
+void GetGeodesic(ARRAY2D &gdsc, int metric_type, double X[NDIM], double K[NDIM])
 {
+    gdsc.clear();
+
     // Initalize the derivative
     double dKdlam[NDIM];
     init_dKdlam(metric_type, X, K, dKdlam);
 
-    std::vector <std::vector <double>> X_traj;
-    std::vector <double> temp;
+    ARRAY temp;
     temp.push_back(X[0]);
     temp.push_back(X[1]);
     temp.push_back(X[2]);
     temp.push_back(X[3]);
 
-    X_traj.push_back(temp);
-    printvar("r init", temp[1]);
-    print4("K", K);
+    gdsc.push_back(temp);
     double Kcov[NDIM];
 
     int nsteps = 0;
@@ -196,102 +175,44 @@ std::vector <std::vector <double>> GetGeodesic(int metric_type, double X[NDIM], 
         temp.push_back(X[2]);
         temp.push_back(X[3]);
 
-        if (fabs(X_traj.back()[1] - X[1]) > 0.05)
+        if (fabs(gdsc.back()[1] - X[1]) > 0.05)
         {
-            X_traj.push_back(temp);
+            gdsc.push_back(temp);
         }
 
         nsteps ++;
     }
-    std::cout<<"\n";
-    std::cout<<"nsteps: "<<nsteps<<'\n';
-    printvar("r", temp[1]);
-    return X_traj;
+    return;
 }
 
 // Output Geodesic DataFile
-void GetGeodesics(std::string Infile, std::string Outfile)
+void GetGeodesics(ARRAY3D &gdscs, const ARRAY2D &X_K)
 {
-    std::ifstream infile(Infile);
-    std::string line;
-    int i,j;
-    double row_data[2*NDIM];
-    std::vector <double> x[NDIM], k[NDIM];
-    while (std::getline(infile, line))
-    {
-        std::istringstream row(line);
-        std::string row_s;
-        for (i=0; i<2*NDIM; i++)
-        {
-            row >> row_s;
-            row_data[i] = std::stod(row_s);
-        }
-        x[0].push_back(row_data[0]);
-        x[1].push_back(row_data[1]);
-        x[2].push_back(row_data[2]);
-        x[3].push_back(row_data[3]);
-        k[0].push_back(row_data[4]);
-        k[1].push_back(row_data[5]);
-        k[2].push_back(row_data[6]);
-        k[3].push_back(row_data[7]);
-    }
+    size_t i,j, N=X_K.size();
+    gdscs.clear();
 
-    std::cout<<"Loaded " << x[0].size() << " geodesics" << std::endl;
     // Now start integrating geodesics
-    std::vector <std::vector <double>> x_geodesic;
-    // _x and _k contain the starting vector of each geodesic
+    // _x and _k contain the starting position and momentum vector of each geodesic
     double _x[NDIM], _k[NDIM], _xks[NDIM], _kks[NDIM];
-    
-    std::ofstream file(Outfile);
-    if (file.is_open())
+    for (i=0; i<N; i++)
     {
-        for (i=0;i<x[0].size();i++)
-        {
-            std::cout<<"Geodesic number: "<<i<<"\n";
-            _x[0] = x[0][i];
-            _x[1] = x[1][i];
-            _x[2] = x[2][i];
-            _x[3] = x[3][i];        
-            _k[0] = k[0][i];
-            _k[1] = k[1][i];
-            _k[2] = k[2][i];
-            _k[3] = k[3][i];
+        ARRAY2D gdsc;
+        _x[0] = X_K[i][0];
+        _x[1] = X_K[i][1];
+        _x[2] = X_K[i][2];
+        _x[3] = X_K[i][3];        
+        _k[0] = X_K[i][4];
+        _k[1] = X_K[i][5];
+        _k[2] = X_K[i][6];
+        _k[3] = X_K[i][8];
 
-            TransformCoordinates(3, 2, _x, _xks);
-            TransformFourVectors(3, 2, _x, _k, _kks);
-            //X_MKSToKS_v2(_x, _xks);
-            //T_MKSToKS_v2(_k, _kks, _x);
+        // Geodesic integration is currently done in Kerr Schild
+        TransformCoordinates(3, 2, _x, _xks);
+        TransformFourVectors(3, 2, _x, _k, _kks);
 
-
-            // now integrate the geodesic
-            x_geodesic = GetGeodesic(2, _xks, _kks);
-            
-            
-            // write to file
-            for (j=0; j<x_geodesic.size(); j++)
-            {
-                    file << x_geodesic[j][0] << "\t";
-            }
-            file<<std::endl;
-            for (j=0; j<x_geodesic.size(); j++)
-            {
-                    file << x_geodesic[j][1] << "\t";
-            }
-            file<<std::endl;
-            for (j=0; j<x_geodesic.size(); j++)
-            {
-                    file << x_geodesic[j][2] << "\t";
-            }
-            file<<std::endl;
-            for (j=0; j<x_geodesic.size(); j++)
-            {
-                    file << x_geodesic[j][3] << "\t";
-            }
-            file<<std::endl;
-        }
-            file.close();
-        
-    
+        // now integrate the geodesic
+        GetGeodesic(gdsc, 2, _xks, _kks);
+        gdscs.push_back(gdsc);
     }
     return;
 }
