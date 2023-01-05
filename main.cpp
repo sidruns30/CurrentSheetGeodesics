@@ -8,6 +8,7 @@ int main()
 
     size_t i, j;
     std::string FNAME("../input/BHAC_data.txt");
+    std::string OUTNAME("geodesics.txt");
     
     ARRAY2D COORDS, PRIMS;
     InitializeArrays(COORDS, PRIMS, FNAME);
@@ -16,9 +17,10 @@ int main()
     PartitionGrid(COORDS, PRIMS);
 
     // Determine how to make the wavevectors (parallel, antiparallel, perp)
+    ARRAY3D gdscs;
     int mode = 0;
 
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for
     for (i=0; i<maxthreads; i++)
     {
         ARRAY2D COORDS_BLOCK = COORDS_BLOCKS[i];
@@ -33,8 +35,14 @@ int main()
         ConstructWavevectors(X_K, mode, indices, COORDS_BLOCK, PRIMS_BLOCK);
 
         // Finally integrate the geodesics
-        ARRAY3D gdscs;
-        GetGeodesics(gdscs, X_K);
+        ARRAY3D gdscs_local;
+        GetGeodesics(gdscs_local, X_K);
+
+        #pragma omp critical
+        gdscs.insert(gdscs.end(), gdscs_local.begin(), gdscs_local.end());
     }
+
+    WriteGeodesics(gdscs, OUTNAME);
+
     return 0;
 }
