@@ -1,9 +1,7 @@
-#include "load_txt.hpp"
-#include "BHAC_MHD.hpp"
+#include "input/load_txt.hpp"
+#include "fluid/BHAC_MHD.hpp"
 #include "partition.hpp"
-#include "geodesic.hpp"
-
-// To do: read up on openmp
+#include "geodesics/geodesic.hpp"
 
 int main()
 {
@@ -26,22 +24,17 @@ int main()
         ARRAY2D COORDS_BLOCK = COORDS_BLOCKS[i];
         ARRAY2D PRIMS_BLOCK = PRIMS_BLOCKS[i];
 
-        // Find the current sheet indices for each block and initialize geodesics
+        // Find the current sheet indices for each block
         std::vector <std::vector <size_t>> indices;
         FindCurrentSheet(indices, COORDS_BLOCK, PRIMS_BLOCK);
         
-        // Now get the wavevectors
+        // Now get the positions and wavevectors of geodesics
         ARRAY2D X_K;
         ConstructWavevectors(X_K, mode, indices, COORDS_BLOCK, PRIMS_BLOCK);
-        //MakeGeodesics(COORDS_BLOCK, PRIMS_BLOCK);
+
+        // Finally integrate the geodesics
+        ARRAY3D gdscs;
+        GetGeodesics(gdscs, X_K);
     }
-
-
-    // Step 3: Integrate the geodesics
-    /*
-    INFILE = "wavevectors.txt";
-    OUTNAME = "geodesics.txt";
-    GetGeodesics(INFILE, OUTNAME);
-    */
     return 0;
 }
