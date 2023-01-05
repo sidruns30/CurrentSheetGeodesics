@@ -104,12 +104,15 @@ void FindCurrentSheet(std::vector <std::vector <size_t>> &indices,
             std::vector <size_t> temp = {i_sheet[i], imax};
             indices.push_back(temp);
         }
-    }    
+    }
+    
+    printvar("Number of cells in the current sheet: ", indices.size());
+
     return;
 }
 
 // Returns the wavevector in MKS
-void Initialize_XK( ARRAY &X_K, double _x, double _y, double _z, 
+void Initialize_XK(ARRAY &X_K, double _x, double _y, double _z, 
                                     double _u0, double _u1, double _u2, double _u3,
                                     double _bfluid0, double _bfluid1, double _bfluid2, double _bfluid3,
                                     int mode)
@@ -210,7 +213,7 @@ void ConstructWavevectors(ARRAY2D &X_K, int mode,
     // Now iterate through the cells of the current sheet to get
     // wavevectors of all the cells
     size_t i, j, N;
-    N = indices[0].size();
+    N = indices.size();
 
     // Clear input array
     X_K.clear();
@@ -243,190 +246,7 @@ void ConstructWavevectors(ARRAY2D &X_K, int mode,
                         _bfluid1, _bfluid2, _bfluid3, mode);
         X_K.push_back(X_K_local);
     }
+
+    printvar("Number of geodesics initialized: ", X_K.size());
     return;
 }
-
-
-/*
-
-
-// We are doing everything in MKS (i.e. metric_type = 3)
-std::vector <double> Initialize_XK( int metric_type, double _x, double _y, double _z, double _u1, double _u2, double _u3,
-                                    double _bfluid0, double _bfluid1, double _bfluid2, double _bfluid3,
-                                    double _lfac, int mode)
-{
-    // mode = {0, 1, 2} for parallel, antiparallel and perpendicular wavevectors
-    int i,j;
-
-    // Get MKS coordinates
-    double XKS[NDIM], XMKS[NDIM];
-    CartToKS(_x, _y, _z, XKS);
-    TransformCoordinates(2, 3, XKS, XMKS);
-
-    // Get both upper and lower metrics
-    double gcov[NDIM][NDIM];
-    double gcon[NDIM][NDIM];
-
-    GcovFunc(metric_type, XMKS, gcov);
-    GconFunc(metric_type, XMKS, gcon);
-
-    // Get upper and lower lapse and shift vectors
-    double  alpha, beta_con[NDIM-1], beta_cov[NDIM-1], 
-            gamma_con[NDIM-1][NDIM-1], gamma_cov[NDIM-1][NDIM-1];
-
-    alpha = sqrt(-1/gcon[0][0]);
-    for (i=0;i<NDIM-1;i++)
-    {
-        beta_con[i] = gcon[0][i+1] * SQR(alpha);
-        beta_cov[i] = gcov[0][i+1];
-    }
-    for (i=0; i<NDIM-1; i++)
-    {
-        for (j=0; j<NDIM-1; j++)
-        {
-            gamma_con[i][j] = gcon[i+1][j+1] + beta_con[i] * beta_con[j] / SQR(alpha);
-            gamma_cov[i][j] = gcov[i+1][j+1];
-        }
-    }
-
-    // Get 3 velocity in MKS
-    double ui_input_Cart[NDIM-1] = {_u1, _u2, _u3}, ui_input_MKS[NDIM-1];
-    T_3CartTo3MKS(ui_input_Cart, ui_input_MKS, XMKS);
-
-    // The contravariant magnetic field
-    double b_con[NDIM] = {_bfluid0, _bfluid1, _bfluid2, _bfluid3};
-    double ui_con[NDIM-1];
-    double  U_con_MKS[NDIM];
-
-    // Input is lfac v^i
-    for(i=0;i<NDIM-1;i++)
-    {
-        ui_con[i] = ui_input_MKS[i] - _lfac * beta_con[i]/alpha;
-    }
-
-    bool success = false;
-    success = Get4Velocity(metric_type, XMKS, ui_con, U_con_MKS, b_con);
-    if (!success)
-    {
-        std::vector <double> X_k = {0.};
-        return X_k;
-    }
-    
-    //Test4Velocity(3, 3, XMKS, U_con_MKS, b_con, _lfac, alpha);
-
-    // Make the tetrad
-    double Econ[NDIM][NDIM];
-    double Ecov[NDIM][NDIM];
-    make_tetrad(U_con_MKS, gcov, Econ, Ecov);
-
-
-    double b_con_tetrad[NDIM];
-    // Get bfluid in the fluid drame
-    coordinate_to_tetrad(Ecov, b_con, b_con_tetrad);
-
-    // The photon wavevector in MKS
-    double k_con_tetrad[NDIM], k_con_MKS[NDIM], k_cov_tetrad[NDIM], k_cov_MKS[NDIM];
-    // parallel
-    if (mode == 0)
-    {
-        for (i=1;i<NDIM;i++)
-        {
-            k_con_tetrad[i] = b_con_tetrad[i];
-        }
-    }
-    // anti parallel
-    else if (mode == 1)
-    {
-        for (i=1; i<NDIM;i++)
-        {
-            k_con_tetrad[i] = -b_con_tetrad[i];
-        }
-    }
-
-    // perpendicular
-    else if (mode == 2)
-    {
-        k_con_tetrad[1] = 1.;
-        k_con_tetrad[2] = 0.;
-        k_con_tetrad[3] = -b_con_tetrad[1]/b_con_tetrad[3];
-    }
-
-    // Normalize the wavevector
-    k_con_tetrad[0] = sqrt(SQR(k_con_tetrad[1]) + SQR(k_con_tetrad[2]) + SQR(k_con_tetrad[3]));
-
-    // Get the coordinate frame
-    tetrad_to_coordinate(Econ, k_con_tetrad, k_con_MKS);
-
-    // Write to full vector + tetrad stuff
-    std::vector <double> X_k = {XMKS[0], XMKS[1], XMKS[2], XMKS[3], k_con_MKS[0], k_con_MKS[1], k_con_MKS[2], k_con_MKS[3]};
-    return X_k;
-}
-
-
-
-// Write the wavevectors to file: give the current sheet arrays and the b field data
-void WriteX_kToFile(std::string Infile, std::string OutName)
-{
-    // Read the existing data from file
-    std::vector <double> all_data[NVARS_SHEET];
-    ReadSheetDataFromFile (Infile, all_data);
-
-    std::vector <double> x = all_data[1];
-    std::vector <double> y = all_data[2];
-    std::vector <double> z = all_data[3];    
-    std::vector <double> x_f = all_data[4];
-    std::vector <double> y_f = all_data[5];
-    std::vector <double> z_f = all_data[6];
-    std::vector <double> u1 = all_data[7];
-    std::vector <double> u2 = all_data[8];
-    std::vector <double> u3 = all_data[9];
-    std::vector <double> Bsqr = all_data[10];
-    std::vector <double> bfluid0 = all_data[11];
-    std::vector <double> bfluid1 = all_data[12];
-    std::vector <double> bfluid2 = all_data[13];
-    std::vector <double> bfluid3 = all_data[14];
-    std::vector <double> lfac = all_data[15];
-    std::vector <double> B2 = all_data[16];
-    std::vector <double> thetaMKS = all_data[17];
-    std::vector <double> rMKS = all_data[18];
-
-    std::cout<<"Data File Read: number of elements = "<<x.size()<<std::endl;
-
-    size_t ind, i=0, j=0;
-    std::vector <std::vector <double>> data;
-    std::vector <double> X_k;
-    
-    for (ind=0; ind<x.size();ind++)
-    {
-        // Mks metric
-        int metric_type = 3;
-        // Parallel wavevectors
-        int mode = 0;
-        X_k = Initialize_XK(metric_type, x_f[ind], y_f[ind], z_f[ind], u1[ind], u2[ind], u3[ind],
-                            bfluid0[ind], bfluid1[ind], bfluid2[ind], bfluid3[ind], lfac[ind], mode);
-
-        if (X_k.size() == 2*NDIM)
-        {
-            // write the position and wave vector
-            data.push_back(X_k);
-            i++;
-        }
-
-        // Anti-parallel wave vectors
-        mode = 1;
-        X_k = Initialize_XK(metric_type, x_f[ind], y_f[ind], z_f[ind], u1[ind], u2[ind], u3[ind],
-                            bfluid0[ind], bfluid1[ind], bfluid2[ind], bfluid3[ind], lfac[ind], mode);
-
-        if (X_k.size() == 2*NDIM)
-        {
-            data.push_back(X_k);
-            i++;
-        }
-    }
-
-    std::cout<<"Number of Geodesics Initialized = "<<data.size()<<std::endl;
-    WriteVectorToFile(OutName, data);
-
-    return;
-}
-*/
