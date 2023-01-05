@@ -34,6 +34,21 @@
 #define h_ks (0.9)
 #define R0_ks (0.)
 
+// Definitions for the geodesics
+#define ETOL 1.e-3
+#define MAX_ITER 10
+#define EPS (0.01)
+#define SMALL (1.e-40)
+
+#define FAST_CPY(in, out)                                                      \
+  {                                                                            \
+    out[0] = in[0];                                                            \
+    out[1] = in[1];                                                            \
+    out[2] = in[2];                                                            \
+    out[3] = in[3];                                                            \
+  }
+
+
 // Variables useful to find the current sheet
 const double SIGMA_THRESHOLD = 3.;
 const double BOX_THRESHOLD = 0.01;
