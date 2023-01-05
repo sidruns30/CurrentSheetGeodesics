@@ -363,8 +363,8 @@ void BHAC_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3,
     }
     if (Nbad > 0)
     {
-        std::cout<<"WARNING: 4 velocity lfac does not match simulation lfac for "<<
-                Nbad<<" out of "<< N << "cells \n";
+        std::cout<<"WARNING: computed four velocity lfac does not match simulation lfac for "<<
+                Nbad<<" out of "<< N << " cells to within 0.1 percent \n";
 
     }
 
