@@ -32,8 +32,6 @@ void init_dKdlam(int metric_type, double X[], double Kcon[], double dK[])
 {
   int k;
   double lconn[NDIM][NDIM][NDIM];
-  double lconn_v2[NDIM][NDIM][NDIM];
-
 
   GetConnectionAnalytic(metric_type, X, lconn);
 

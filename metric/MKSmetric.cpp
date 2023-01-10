@@ -232,10 +232,12 @@ void GetMKSConnection(double X[NDIM], double gamma[NDIM][NDIM][NDIM])
     double rprime      = exp(X[1]);
     double rprime2     = rprime * rprime;
     double rprimeprime = rprime;
-    double theta       = M_PI * X[2] + 0.5 * (1. - h_ks) * sin(2. * M_PI * X[2]);
-    double thetaprime  = M_PI * (1. + (1. - h_ks) * cos(2. * M_PI * X[2]));
+
+    double theta = X[2] + 0.5 * h_ks * sin(2. * X[2]);
+    double thetaprime = (1. +  h_ks * cos(2. * X[2]));
     double thetaprime2 = thetaprime * thetaprime;
-    double thetaprimeprime = -2. * M_PI * M_PI * (1. - h_ks) * sin(2. * M_PI * X[2]);
+    double thetaprimeprime = -2. * h_ks * sin(2. * X[2]);
+
     double costh       = cos(theta);
     double cos2th      = costh * costh;
     double sinth       = sin(theta);
