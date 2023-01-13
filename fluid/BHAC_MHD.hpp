@@ -19,6 +19,7 @@ extern ARRAY   blfuid0, bfluid1, bfluid2, bfluid3,
         efluid0, efluid1, efluid2, efluid3, Esqr,
         e2, temp;
 
+
 // Return global fluid quantities
 namespace BHAC_MHD
 {

@@ -89,47 +89,44 @@ void BHAC_MHD::Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &
         else
         {
             // Taken from equations 35 and 36 of https://iopscience.iop.org/article/10.3847/1538-4365/ab3922/pdf
+            // eq 24 of N. Bucciantini and L. Del Zanna (2013)
 
             // Get MKS E field (covariant)
-            double E4MKS[NDIM] = {0., EMKS[0], EMKS[1], EMKS[2]};
-            double E4MKS_cov[NDIM];
-            UpperToLower(3, XMKS, E4MKS, E4MKS_cov);
+            double EMKS_cov[NDIM-1];
+            UpperToLower3(3, XMKS, EMKS, EMKS_cov);
 
             // Make the 4 vectors
-            double v4_cov[NDIM], v4_con[NDIM];
             double B4MKS[NDIM] = {0, BMKS[0], BMKS[1], BMKS[2]};
-            
-            // eq 24 of N. Bucciantini and L. Del Zanna (2013)
-            for (j = 0; j<NDIM; j++)
-            {
-                v4_con[j] = u_con[j] / lfac - n_con[j];
-            }
-            
-            UpperToLower(3, XMKS, v4_con, v4_cov);
+                        
             double b_calc[NDIM];
 
+            // Below eq 27 of N. Bucciantini and L. Del Zanna (2013)
+            // Determinant factor of the gamma matric
+            double detgam = Detgammacov(3, XMKS);
 
-            for (j=0; j<NDIM; j++)
+            // First the contraction with the leviicivita symbol
+            double vcrossE[NDIM-1] = {0., 0., 0.};
+
+            // Bug in the spatial components ?
+            // Check the following: detgamm, covariant fields, levi civita
+            for (j=1; j<NDIM; j++)
             {
-
-                // Below eq 27 of N. Bucciantini and L. Del Zanna (2013)
-                // Determinant factor of the gamma matric
-                double detgam = Detgammacov(3, XMKS);
-
-                // First the contraction with the leveicivita symbol
-                double vcrossE = 0.;
-
                 for (k=1; k<NDIM; k++)
                 {
                     for (l=1; l<NDIM; l++)
                     {
-                        vcrossE += n_cov[0] * GetEta(j,k,l,0) * v4_cov[k] * E4MKS_cov[l] / sqrt(detgam);
+                        vcrossE[j-1] +=  GetEta(j,k,l) * v_cov[k-1] * EMKS_cov[l-1] / sqrt(detgam);
                     }
                 }
-
-                // Set the b fluid
-                    b_calc[j] = lfac * (Bivi * n_con[j] + B4MKS[j] - vcrossE);
             }
+            // Set the b fluid
+            // ! b^mu = lfac*(v.B)*n^mu + lfac*(B^mu - (vxE)^mu) (Bucciantini & Delzanna 2013)
+            b_calc[0] = lfac * Bivi * n_con[0];
+            for (j=1; j<NDIM; j++)
+            {
+                b_calc[j] = lfac * Bivi * n_con[j] + lfac * (B4MKS[j] - vcrossE[j-1]);
+            }
+
             bfluid0.push_back(b_calc[0]);
             bfluid1.push_back(b_calc[1]);
             bfluid2.push_back(b_calc[2]);
@@ -207,50 +204,39 @@ void BHAC_MHD::Getefluid(ARRAY &efluid0, ARRAY &efluid1, ARRAY &efluid2, ARRAY &
 
         else
         {
-         // Taken from equations 35 and 36 of https://iopscience.iop.org/article/10.3847/1538-4365/ab3922/pdf
-
-
-            // Get MKS E field (contravariant)
-
             // Get MKS E field (covariant)
-            double B4MKS[NDIM] = {0., BMKS[0], BMKS[1], BMKS[2]};
-            double B4MKS_cov[NDIM];
-            UpperToLower(3, XMKS, B4MKS, B4MKS_cov);
+            double BMKS_cov[NDIM-1];
+            UpperToLower3(3, XMKS, BMKS, BMKS_cov);
 
             // Make the 4 vectors
-            double v4_cov[NDIM], v4_con[NDIM];
             double E4MKS[NDIM] = {0, EMKS[0], EMKS[1], EMKS[2]};
-            
-            // eq 24 of N. Bucciantini and L. Del Zanna (2013)
-            for (j = 0; j<NDIM; j++)
-            {
-                v4_con[j] = u_con[j] / lfac - n_con[j];
-            }
-            
-            UpperToLower(3, XMKS, v4_con, v4_cov);
+
             double e_calc[NDIM];
+        
+            // Below eq 27 of N. Bucciantini and L. Del Zanna (2013)
+            // Determinant factor of the gamma matric
+            double detgam = Detgammacov(3, XMKS);
 
-            for (j=0; j<NDIM; j++)
+            // First the contraction with the leveicivita symbol
+            double vcrossB[NDIM-1] = {0., 0., 0.};
+
+            for (j=1; j<NDIM; j++)
             {
-
-                // Below eq 27 of N. Bucciantini and L. Del Zanna (2013)
-                // Determinant factor of the gamma matric
-                double detgam = Detgammacov(3, XMKS);
-
-                // First the contraction with the leveicivita symbol
-                double vcrossB = 0.;
-
                 for (k=1; k<NDIM; k++)
                 {
                     for (l=1; l<NDIM; l++)
                     {
-                        vcrossB += n_cov[0] * GetEta(j,k,l,0) * v4_cov[k] * B4MKS_cov[l] / sqrt(detgam);
+                        vcrossB[j] += GetEta(j,k,l) * v_cov[k-1] * BMKS_cov[l-1] / sqrt(detgam);
                     }
                 }
-
-                // Set the b fluid
-                    e_calc[j] = lfac * (Eivi * n_con[j] + E4MKS[j] + vcrossB);
             }
+
+            // Set the e fluid
+            e_calc[0] = lfac * Eivi * n_con[0];
+            for (j=1; j<NDIM; j++)
+            {
+                e_calc[j] = lfac * Eivi * n_con[j] + lfac * (E4MKS[j] + vcrossB[j-1]);
+            }            
             
             efluid0.push_back(e_calc[0]);
             efluid1.push_back(e_calc[1]);
