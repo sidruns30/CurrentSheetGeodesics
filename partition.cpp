@@ -14,7 +14,6 @@
 ARRAY3D COORDS_BLOCKS;
 ARRAY3D PRIMS_BLOCKS;
 
-
 // Return an array of arrays of indices over which to partition the grid
 // Also clears the input COORDS and PRIMS arrays
 void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
@@ -35,8 +34,14 @@ void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
         phi.push_back(atan2(_y, _x));
     }
 
-    // Get the sorted indices of phi
-    std::vector <size_t> phi_indices = sort_indices(phi);
+    // Get the sorted indices of phi (useful for finding cells in global arrays)
+    // Only sort in phi when openmp is enabled
+    std::vector <size_t> phi_indices(phi.size());
+    #if defined(_OPENMP)
+        phi_indices = sort_indices(phi);
+    #else
+        iota(phi_indices.begin(), phi_indices.end(), 0);
+    #endif
 
     // Partition based on resources
     const int block_size = N / maxthreads;
