@@ -37,7 +37,9 @@ def LoadVtk(fname:str, array_names:list):
     array_names = ["x", "y", "z"] + array_names
     return data_np, array_names
 
-# Convert numpy data to hdf5 format
+"""
+    Convert numpy data to hdf5 format
+"""
 def ConvertToHDF5(data:np.ndarray, array_names:list):
     savefile = "BHAC_data.hdf5"
     with h5py.File(savefile, "w") as _file:
@@ -47,7 +49,9 @@ def ConvertToHDF5(data:np.ndarray, array_names:list):
     print("Successfully created HDF5 dataset")
     return
 
-# Convert to text
+"""
+    Convert to text
+"""
 def ConvertToText(data:np.ndarray, array_names:list):
     savefile = "BHAC_data.txt"
     ncells = data.shape[0]
@@ -64,17 +68,56 @@ def ConvertToText(data:np.ndarray, array_names:list):
     print("Successfully created text data")
     return
 
+"""
+    Convert vtk to vtu
+    Takes multiple fnames for each array and a dir for where
+    the files are located
+"""
+def vtkTovtu(fnames, dir, outname="test.vtu"):
+    print("Converting vtk to vtu...")
+    import meshio
+
+    point_data = {}
+    for file in fnames:
+        loc = dir + file
+        mesh = meshio.read(loc, file_format="vtk")
+        
+        # append all the arrays into one 
+        for key, value in mesh.point_data.items():
+            if value.shape[-1] == 3:
+                if file == "Bcart_reduced212_9537n0.vtk":
+                    point_data["b1"] = value[:,0]
+                    point_data["b2"] = value[:,1]
+                    point_data["b3"] = value[:,2]
+                elif file == "vcart_reduced212_9537n0.vtk":
+                    point_data["u1"] = value[:,0]
+                    point_data["u2"] = value[:,1]
+                    point_data["u3"] = value[:,2]
+            else: 
+                point_data[key] = value
+
+     # create a mesh object
+    points = mesh.points
+    cells = mesh.cells # suspicious -- do all arrays have the same cells?
+    del mesh
+    mesh = meshio.Mesh(points=points, cells=cells, point_data=point_data)
+    mesh.write(outname)
+    print("done")
+    return
 
 
 def main():
-    fname = "/Users/siddhant/research/bh-flare/bhflare/analysis/data_convert1335.vtu"
-    array_names = ["u1", "u2", "u3", "b1", "b2", "b3", "e1", "e2", "e3", 
-                    "lfac", "p", "rho", 
-                    "Bsqr", "B2", "E2",
-                    "bfluid0", "bfluid1", "bfluid2", "bfluid3", 
-                    "efluid0", "efluid1", "efluid2", "efluid3", "rMKS", "thetaMKS"
-                    ]
-    data, array_names = LoadVtk(fname, array_names)
+    # first load the vtk and make a vtu
+    datadir = "/Users/siddhant/research/bh-flare/data/lightcurve/"
+    fnames =    ["p_reduced212_9537n0.vtk", "Bcart_reduced212_9537n0.vtk", 
+            "Rho_reduced212_9537n0.vtk", "vcart_reduced212_9537n0.vtk"]
+    vtkTovtu(fnames=fnames, dir=datadir, outname="test.vtu")
+
+    #fname = "/Users/siddhant/research/bh-flare/data/data_convert0303.vtu"
+    outname="test.vtu"
+    array_names = ["u1", "u2", "u3", "b1", "b2", "b3", 
+                    "p", "rho"]
+    data, array_names = LoadVtk(outname, array_names)
     #ConvertToHDF5(data, array_names)
     ConvertToText(data, array_names)
     del data
