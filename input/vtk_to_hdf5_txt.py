@@ -105,22 +105,66 @@ def vtkTovtu(fnames, dir, outname="test.vtu"):
     print("done")
     return
 
+"""
+    Covert vtk to npz arrays
+"""
+def vtkTonpz(fnames, dir, outname="test.npz"):
+    print("Converting vtk to npz")
+    import meshio
+
+    x = np.ndarray([])
+    y = np.ndarray([])
+    z = np.ndarray([])
+    p = np.ndarray([])
+    rho = np.ndarray([])
+    u1 = np.ndarray([])
+    u2 = np.ndarray([])
+    u3 = np.ndarray([])
+    b1 = np.ndarray([])
+    b2 = np.ndarray([])
+    b3 = np.ndarray([])
+
+    for file in fnames:
+        loc = dir + file
+        mesh = meshio.read(loc, file_format="vtk")
+        # append arrays into npz arrays
+        for key, value in mesh.point_data.items():
+            if file == "Bcart_reduced212_9537n0.vtk":
+                b1 = value[:,0]
+                b2 = value[:,1]
+                b3 = value[:,2]
+            elif file == "vcart_reduced212_9537n0.vtk":
+                u1 = value[:,0]
+                u2 = value[:,1]
+                u3 = value[:,2]
+            elif file == "p_reduced212_9537n0.vtk":
+                p = value[:]
+            elif file == "Rho_reduced212_9537n0.vtk":
+                rho = value[:]
+        
+    x = mesh.points[:,0]
+    y = mesh.points[:,1]
+    z = mesh.points[:,2]
+
+    np.savez(outname, x=x, y=y, z=z, p=p, rho=rho, u1=u1, 
+                u2=u2, u3=u3, b1=b1, b2=b2, b3=b3)
+    return
 
 def main():
     # first load the vtk and make a vtu
     datadir = "/Users/siddhant/research/bh-flare/data/lightcurve/"
     fnames =    ["p_reduced212_9537n0.vtk", "Bcart_reduced212_9537n0.vtk", 
             "Rho_reduced212_9537n0.vtk", "vcart_reduced212_9537n0.vtk"]
-    vtkTovtu(fnames=fnames, dir=datadir, outname="test.vtu")
+    vtkTonpz(fnames=fnames, dir=datadir, outname="test.npz")
 
     #fname = "/Users/siddhant/research/bh-flare/data/data_convert0303.vtu"
-    outname="test.vtu"
-    array_names = ["u1", "u2", "u3", "b1", "b2", "b3", 
-                    "p", "rho"]
-    data, array_names = LoadVtk(outname, array_names)
+    #outname="test.vtu"
+    #array_names = ["u1", "u2", "u3", "b1", "b2", "b3", 
+    #                "p", "rho"]
+    #data, array_names = LoadVtk(outname, array_names)
     #ConvertToHDF5(data, array_names)
-    ConvertToText(data, array_names)
-    del data
+    #ConvertToText(data, array_names)
+    #del data
     return
 
 if __name__ == "__main__":
