@@ -428,3 +428,92 @@ void GetKSField(double x, double y, double z, double b1, double b2, double b3, d
     bph = (-y/SQR(a))*b1 + (x/SQR(a))*b2;
     return;
 }
+
+// Convert a tensor in Cartesian coordinates to KS coordinates (basically cartesian to spherical)
+void T_3CartTo3_KS(double T3Cart[NDIM-1], double T3KS[NDIM-1], double XKS[NDIM])
+{
+    double J[NDIM-1][NDIM-1];
+    double r = XKS[1];
+    double theta = XKS[2];
+    double phi = XKS[3];
+
+    J[0][0] = cos(phi) * sin(theta);
+    J[1][0] = sin(phi) * sin(theta);
+    J[2][0] = cos(theta);
+
+    J[0][1] = r * cos(phi) * cos(theta);
+    J[1][1] = r * sin(phi) * cos(theta);
+    J[2][1] = -r * sin(theta);
+    
+    J[0][2] = -r * sin(phi) * sin(theta);
+    J[1][2] = r * cos(phi) * sin(theta);
+    J[2][2] = 0;
+
+    // Now invert J
+    double Jinv[NDIM-1][NDIM-1];
+    bool success = Invert3Matrix(J, Jinv);
+
+    if (!success)
+    {
+        std::cout<<"Failed to invert matrix \n";
+        return;
+    }
+
+    T3KS[0] = Jinv[0][0] * T3Cart[0] + Jinv[0][1] * T3Cart[1] + Jinv[0][2] * T3Cart[2];
+    T3KS[1] = Jinv[1][0] * T3Cart[0] + Jinv[1][1] * T3Cart[1] + Jinv[1][2] * T3Cart[2];
+    T3KS[2] = Jinv[2][0] * T3Cart[0] + Jinv[2][1] * T3Cart[1] + Jinv[2][2] * T3Cart[2];
+
+    return;
+}
+
+
+// Convert a tensor in KS coordinates to Cartesian coordinates (basically spherical to cartesian) for HARM
+void T_3KSTo_3Cart(double T3KS[NDIM-1], double T3Cart[NDIM-1], double XKS[NDIM])
+{
+    double J[NDIM-1][NDIM-1];
+    double r = XKS[1];
+    double theta = XKS[2];
+    double phi = XKS[3];
+
+    J[0][0] = cos(phi) * sin(theta);
+    J[1][0] = sin(phi) * sin(theta);
+    J[2][0] = cos(theta);
+
+    J[0][1] = r * cos(phi) * cos(theta);
+    J[1][1] = r * sin(phi) * cos(theta);
+    J[2][1] = -r * sin(theta);
+    
+    J[0][2] = -r * sin(phi) * sin(theta);
+    J[1][2] = r * cos(phi) * sin(theta);
+    J[2][2] = 0;
+
+
+    T3Cart[0] = J[0][0] * T3KS[0] + J[0][1] * T3KS[1] + J[0][2] * T3KS[2];
+    T3Cart[1] = J[1][0] * T3KS[0] + J[1][1] * T3KS[1] + J[1][2] * T3KS[2];
+    T3Cart[2] = J[2][0] * T3KS[0] + J[2][1] * T3KS[1] + J[2][2] * T3KS[2];
+
+    return;
+}
+
+// Convert a tensor in log KS coordinates to regular KS
+void T_3logKSTo3_KS(double T3logKS[NDIM-1], double T3KS[NDIM-1], double XKS[NDIM])
+{
+    double r = XKS[1];
+    T3KS[0] = T3logKS[0];
+    T3KS[1] = r * T3logKS[1];
+    T3KS[2] = T3logKS[2];
+    T3KS[3] = T3logKS[3];
+    return;
+}
+
+
+// Convert a tensor in regular KS coordinates to log KS
+void T_3KSTo3_logKS(double T3KS[NDIM-1], double T3logKS[NDIM-1], double XKS[NDIM])
+{
+    double r = XKS[1];
+    T3logKS[0] = T3KS[0];
+    T3logKS[1] = T3KS[1] / r;
+    T3logKS[2] = T3KS[2];
+    T3logKS[3] = T3KS[3];
+    return;
+}
