@@ -18,7 +18,8 @@ ARRAY3D PRIMS_BLOCKS;
 // Also clears the input COORDS and PRIMS arrays
 void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
 {
-    ARRAY x, y, z, rho, P, B1, B2, B3, E1, E2, E3, V1, V2, V3, lfac;
+    std::cout<<"Partitioning grid"<<std::endl;
+    ARRAY x, y, z, rho, P, B1, B2, B3, E1, E2, E3, V1, V2, V3;
 
     x = COORDS[0];
     y = COORDS[1];
@@ -74,27 +75,33 @@ void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
             V1.push_back(PRIMS[iprim["V1"]][ind]);
             V2.push_back(PRIMS[iprim["V2"]][ind]);
             V3.push_back(PRIMS[iprim["V3"]][ind]);
-            E1.push_back(PRIMS[iprim["E1"]][ind]);
-            E2.push_back(PRIMS[iprim["E2"]][ind]);
-            E3.push_back(PRIMS[iprim["E3"]][ind]);
-            lfac.push_back(PRIMS[iprim["lfac"]][ind]);
+            if (COORDS.size() == 11)
+            {
+                E1.push_back(PRIMS[iprim["E1"]][ind]);
+                E2.push_back(PRIMS[iprim["E2"]][ind]);
+                E3.push_back(PRIMS[iprim["E3"]][ind]);
+            }
         }
+
         COORDS_BLOCKS_local.push_back(x);
         COORDS_BLOCKS_local.push_back(y);
         COORDS_BLOCKS_local.push_back(z);
 
+        PRIMS_BLOCKS_local.push_back(rho);
+        PRIMS_BLOCKS_local.push_back(P);
         PRIMS_BLOCKS_local.push_back(V1);
         PRIMS_BLOCKS_local.push_back(V2);
         PRIMS_BLOCKS_local.push_back(V3);
         PRIMS_BLOCKS_local.push_back(B1);
         PRIMS_BLOCKS_local.push_back(B2);
         PRIMS_BLOCKS_local.push_back(B3);
-        PRIMS_BLOCKS_local.push_back(E1);
-        PRIMS_BLOCKS_local.push_back(E2);
-        PRIMS_BLOCKS_local.push_back(E3);
-        PRIMS_BLOCKS_local.push_back(lfac);
-        PRIMS_BLOCKS_local.push_back(P);
-        PRIMS_BLOCKS_local.push_back(rho);
+        if (COORDS.size() == 1)
+        {
+            PRIMS_BLOCKS_local.push_back(E1);
+            PRIMS_BLOCKS_local.push_back(E2);
+            PRIMS_BLOCKS_local.push_back(E3);
+        }
+
 
         COORDS_BLOCKS.push_back(COORDS_BLOCKS_local);
         PRIMS_BLOCKS.push_back(PRIMS_BLOCKS_local);
@@ -113,7 +120,6 @@ void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
         V1.clear();
         V2.clear();
         V3.clear();
-        lfac.clear();
     }
 
     COORDS.clear();
