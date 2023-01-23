@@ -13,3 +13,4 @@ void FindCurrentSheet(std::vector <std::vector <size_t>> &indices,
 void ConstructWavevectors(ARRAY2D &X_K, int mode,
                         const std::vector <std::vector <size_t>> &indices, 
                         ARRAY2D &COORDS_BLOCK, ARRAY2D &PRIMS_BLOCK);
+
