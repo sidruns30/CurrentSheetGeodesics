@@ -1,13 +1,10 @@
-#include <iostream>
-#include <cstdio>
-#include <cmath>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <numeric>
-#include <algorithm>
+#ifndef DEF_HEAD
+#define DEF_HEAD (1)
+#include "../defs.hpp"
+#endif
 
 
-void InitializeArrays(std::string FILE_NAME);
-const int NVARS = 16;
+const int NVARS = 28;
+void InitializeArrays(ARRAY2D &COORDS, ARRAY2D &PRIMS, std::string FILE_NAME);
+void InitializeArraysMmap(std::string fname);
+void InitializeNumpyArrays(ARRAY2D &COORDS, ARRAY2D &PRIMS, std::string fname);
