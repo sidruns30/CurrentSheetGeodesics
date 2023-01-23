@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <bits/stdc++.h>
 #include <omp.h>
+#include "cnpy/cnpy.h"
 
 // OpenMP support
 #if defined(_OPENMP)
@@ -96,7 +97,7 @@ std::vector <size_t> sort_indices(const std::vector <double> &v);
 
 
 void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> &data);
-
+void WriteVectorToNumpyArray(std::string fname, ARRAY &data);
 
 // For debugging
 template <typename T>

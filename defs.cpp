@@ -99,6 +99,14 @@ void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> &da
 
 }
 
+// A not needed wrapper just to make the names match :P
+void WriteVectorToNumpyArray(std::string fname, ARRAY &data)
+{
+    std::string mode("w");
+    cnpy::npy_save(fname, data, mode);
+    return;
+}
+
 // Matrix manipulations for 3 and 4 dimensional matrices
 
 // Code to invert matrix, taken from https://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
