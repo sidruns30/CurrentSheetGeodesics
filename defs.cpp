@@ -1,8 +1,11 @@
 #include "defs.hpp"
 
+
+
+
 // Make the map for primitives
-std::unordered_map <std::string, int> iprim =   {{"V1",0}, {"V2",1},{"V3",2}, {"B1",3},{"B2",4}, {"B3",5},
-                                        {"E1",6}, {"E2",7},{"E3",8}, {"lfac",9},{"P",10}, {"rho",11}};
+std::unordered_map <std::string, int> iprim =   {{"rho",0}, {"P",1},{"V1",2}, {"V2",3},{"V3",4}, {"B1",5},
+                                        {"B2",6}, {"B3",7},{"E1",8}, {"E2",9},{"E3",10}};
 
 // Generic print (not sure where to place for now)
 void print(std::string out)
