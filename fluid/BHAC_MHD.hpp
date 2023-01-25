@@ -5,8 +5,6 @@
 
 #include "../metric/metric.hpp"
 
-// To do: make the function arguments to be const &ARRAY
-
 // The coords and primitives are given by the reader. The file only requires to be linked to the
 // metric file
 

@@ -1,5 +1,7 @@
 #include "BHAC_MHD.hpp"
 
+
+// NEED TO ADD LFAC CALC
 /*
     Compute various (ideal) MHD quantities from the primitive inputs.
     The inputs include:
@@ -46,11 +48,11 @@ void BHAC_MHD::Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &
         TransformCoordinates(2, 3, XKS, XMKS);
         
         // Get MKS E and B fields
-        double EMKS[NDIM-1], ECart[NDIM-1] =    {PRIMS_BLOCK[iprim["E1"]][i], 
-                                                PRIMS_BLOCK[iprim["E2"]][i], PRIMS_BLOCK[iprim["E3"]][i]};
+        double EMKS[NDIM-1], ECart[NDIM-1] =    {PRIMS_BLOCK[iEX][i], 
+                                                PRIMS_BLOCK[iEY][i], PRIMS_BLOCK[iEZ][i]};
         T_3CartTo3MKS(ECart, EMKS, XMKS);
-        double BMKS[NDIM-1], BCart[NDIM-1] =    {PRIMS_BLOCK[iprim["B1"]][i], 
-                                    PRIMS_BLOCK[iprim["B2"]][i], PRIMS_BLOCK[iprim["B3"]][i]};
+        double BMKS[NDIM-1], BCart[NDIM-1] =    {PRIMS_BLOCK[iBX][i], 
+                                    PRIMS_BLOCK[iBY][i], PRIMS_BLOCK[iBZ][i]};
         T_3CartTo3MKS(BCart, BMKS, XMKS);
 
 
@@ -66,7 +68,7 @@ void BHAC_MHD::Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &
         double n_con[NDIM] = {1/alpha, -beta_con[0]/alpha, -beta_con[1]/alpha, -beta_con[2]/alpha};
         double n_cov[NDIM] = {-alpha, 0, 0, 0};
 
-        double lfac = PRIMS_BLOCK[iprim["lfac"]][i];
+        double lfac = -1.;//PRIMS_BLOCK[iprim["lfac"]][i];
 
         double u_con[NDIM] = {u0[i], u1[i], u2[i], u3[i]}, u_cov[NDIM];
         UpperToLower(3, XMKS, u_con, u_cov);
@@ -167,11 +169,11 @@ void BHAC_MHD::Getefluid(ARRAY &efluid0, ARRAY &efluid1, ARRAY &efluid2, ARRAY &
         TransformCoordinates(2, 3, XKS, XMKS);
 
         // Get MKS E and B fields
-        double EMKS[NDIM-1], ECart[NDIM-1] =    {PRIMS_BLOCK[iprim["E1"]][i], 
-                                                PRIMS_BLOCK[iprim["E2"]][i], PRIMS_BLOCK[iprim["E3"]][i]};
+        double EMKS[NDIM-1], ECart[NDIM-1] =    {PRIMS_BLOCK[iEX][i], 
+                                                PRIMS_BLOCK[iEY][i], PRIMS_BLOCK[iEZ][i]};
         T_3CartTo3MKS(ECart, EMKS, XMKS);
-        double BMKS[NDIM-1], BCart[NDIM-1] =    {PRIMS_BLOCK[iprim["B1"]][i], 
-                                    PRIMS_BLOCK[iprim["B2"]][i], PRIMS_BLOCK[iprim["B3"]][i]};
+        double BMKS[NDIM-1], BCart[NDIM-1] =    {PRIMS_BLOCK[iBX][i], 
+                                    PRIMS_BLOCK[iBY][i], PRIMS_BLOCK[iBZ][i]};
         T_3CartTo3MKS(BCart, BMKS, XMKS);
 
         // Get the metric
@@ -186,7 +188,7 @@ void BHAC_MHD::Getefluid(ARRAY &efluid0, ARRAY &efluid1, ARRAY &efluid2, ARRAY &
         double n_con[NDIM] = {1/alpha, -beta_con[0]/alpha, -beta_con[1]/alpha, -beta_con[2]/alpha};
         double n_cov[NDIM] = {-alpha, 0, 0, 0};
 
-        double lfac = PRIMS_BLOCK[iprim["lfac"]][i];
+        double lfac = -1;//PRIMS_BLOCK[iprim["lfac"]][i];
 
         double u_con[NDIM] = {u0[i], u1[i], u2[i], u3[i]}, u_cov[NDIM];
         UpperToLower(3, XMKS, u_con, u_cov);
@@ -265,10 +267,10 @@ void BHAC_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3,
     for (i=0; i<N; i++)
     {
         double x, y, z, V1, V2, V3, lfac;
-        V1 = PRIMS_BLOCK[iprim["V1"]][i];
-        V2 = PRIMS_BLOCK[iprim["V2"]][i];
-        V3 = PRIMS_BLOCK[iprim["V3"]][i];
-        lfac = PRIMS_BLOCK[iprim["lfac"]][i];
+        V1 = PRIMS_BLOCK[iVX][i];
+        V2 = PRIMS_BLOCK[iVY][i];
+        V3 = PRIMS_BLOCK[iVZ][i];
+        lfac = -1;//PRIMS_BLOCK[iprim["lfac"]][i];
         x = COORDS_BLOCK[0][i];
         y = COORDS_BLOCK[1][i];
         z = COORDS_BLOCK[2][i];
@@ -374,8 +376,8 @@ void BHAC_MHD::GetBsqr(ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &
         TransformCoordinates(2, 3, XKS, XMKS);
         
         // Get MKS B fields
-        double BMKS[NDIM-1], BCart[NDIM-1] =    {PRIMS_BLOCK[iprim["B1"]][i], 
-                                    PRIMS_BLOCK[iprim["B2"]][i], PRIMS_BLOCK[iprim["B3"]][i]};
+        double BMKS[NDIM-1], BCart[NDIM-1] =    {PRIMS_BLOCK[iBX][i], 
+                                    PRIMS_BLOCK[iBY][i], PRIMS_BLOCK[iBZ][i]};
         T_3CartTo3MKS(BCart, BMKS, XMKS);
 
         // Get the metric
@@ -416,8 +418,8 @@ void BHAC_MHD::GetEsqr(ARRAY &Esqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &
         TransformCoordinates(2, 3, XKS, XMKS);
         
         // Get MKS E fields
-        double EMKS[NDIM-1], ECart[NDIM-1] =    {PRIMS_BLOCK[iprim["E1"]][i], 
-                                    PRIMS_BLOCK[iprim["E2"]][i], PRIMS_BLOCK[iprim["E3"]][i]};
+        double EMKS[NDIM-1], ECart[NDIM-1] =    {PRIMS_BLOCK[iEX][i], 
+                                    PRIMS_BLOCK[iEY][i], PRIMS_BLOCK[iEZ][i]};
         T_3CartTo3MKS(ECart, EMKS, XMKS);
 
         // Get the metric
@@ -476,7 +478,7 @@ void BHAC_MHD::GetTemp(ARRAY &temp, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &
 
     for (i=0; i<N; i++)
     {
-        temp.push_back(PRIMS_BLOCK[iprim["rho"]][i] / PRIMS_BLOCK[iprim["P"]][i]);
+        temp.push_back(PRIMS_BLOCK[iRHO][i] / PRIMS_BLOCK[iP][i]);
     }    
     return;
 }
@@ -496,7 +498,7 @@ void BHAC_MHD::GetSigma(ARRAY &sigma, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, 
 
     for (i=0; i<N; i++)
     {
-        sigma.push_back(Bsqr[i] / PRIMS_BLOCK[iprim["rho"]][i]);
+        sigma.push_back(Bsqr[i] / PRIMS_BLOCK[iRHO][i]);
     }
 
     return;
@@ -517,7 +519,7 @@ void BHAC_MHD::GetBeta(ARRAY &beta, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, co
 
     for (i=0; i<N; i++)
     {
-        beta.push_back(PRIMS_BLOCK[iprim["P"]][i] / Bsqr[i]);
+        beta.push_back(PRIMS_BLOCK[iP][i] / Bsqr[i]);
     }    
     return;
 }
