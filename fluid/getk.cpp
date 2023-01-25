@@ -54,7 +54,7 @@ void FindCurrentSheet(std::vector <std::vector <size_t>> &indices,
     // indices of cells containing the current sheet
     std::vector <size_t> i_sheet;
     size_t i, j, k, N;
-    N = PRIMS_BLOCK[iprim["rho"]].size();
+    N = PRIMS_BLOCK[iRHO].size();
 
     ARRAY Bsqr;
     BHAC_MHD::GetBsqr(Bsqr, COORDS_BLOCK, PRIMS_BLOCK);
@@ -62,7 +62,7 @@ void FindCurrentSheet(std::vector <std::vector <size_t>> &indices,
     // Get all of the current sheet
     for (i=0; i<N; i++)
     {
-        double sigma = Bsqr[i]/PRIMS_BLOCK[iprim["rho"]][i];
+        double sigma = Bsqr[i]/PRIMS_BLOCK[iRHO][i];
         if (sigma < SIGMA_THRESHOLD)
         {
             i_sheet.push_back(i);

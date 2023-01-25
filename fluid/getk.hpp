@@ -6,6 +6,7 @@
 // Coordinates also imports metric
 #include "../metric/metric.hpp"
 #include "BHAC_MHD.hpp"
+#include "HAMR_MHD.hpp"
 
 // Main functions to be called in main
 void FindCurrentSheet(std::vector <std::vector <size_t>> &indices, 
