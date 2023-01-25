@@ -67,19 +67,19 @@ void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
             x.push_back(COORDS[0][ind]);
             y.push_back(COORDS[1][ind]);
             z.push_back(COORDS[2][ind]);
-            rho.push_back(PRIMS[iprim["rho"]][ind]);
-            P.push_back(PRIMS[iprim["P"]][ind]);
-            B1.push_back(PRIMS[iprim["B1"]][ind]);
-            B2.push_back(PRIMS[iprim["B2"]][ind]);
-            B3.push_back(PRIMS[iprim["B3"]][ind]);
-            V1.push_back(PRIMS[iprim["V1"]][ind]);
-            V2.push_back(PRIMS[iprim["V2"]][ind]);
-            V3.push_back(PRIMS[iprim["V3"]][ind]);
+            rho.push_back(PRIMS[iRHO][ind]);
+            P.push_back(PRIMS[iP][ind]);
+            B1.push_back(PRIMS[iBX][ind]);
+            B2.push_back(PRIMS[iBY][ind]);
+            B3.push_back(PRIMS[iBZ][ind]);
+            V1.push_back(PRIMS[iVX][ind]);
+            V2.push_back(PRIMS[iVY][ind]);
+            V3.push_back(PRIMS[iVZ][ind]);
             if (COORDS.size() == 11)
             {
-                E1.push_back(PRIMS[iprim["E1"]][ind]);
-                E2.push_back(PRIMS[iprim["E2"]][ind]);
-                E3.push_back(PRIMS[iprim["E3"]][ind]);
+                E1.push_back(PRIMS[iEX][ind]);
+                E2.push_back(PRIMS[iEY][ind]);
+                E3.push_back(PRIMS[iEZ][ind]);
             }
         }
 
