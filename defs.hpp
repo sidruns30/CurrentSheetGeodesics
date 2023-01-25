@@ -41,6 +41,19 @@
 #define EPS (0.01)
 #define SMALL (1.e-40)
 
+// Definitions for indices
+#define iRHO (0)
+#define iP (1)
+#define iVX (2)
+#define iVY (3)
+#define iVZ (4)
+#define iBX (5)
+#define iBY (6)
+#define iBZ (7)
+#define iEX (8)
+#define iEY (9)
+#define iEZ (10)
+
 #define FAST_CPY(in, out)                                                      \
   {                                                                            \
     out[0] = in[0];                                                            \
@@ -62,14 +75,6 @@ const bool idealMHD = false;
 typedef std::vector <double> ARRAY;
 typedef std::vector <ARRAY> ARRAY2D;
 typedef std::vector <ARRAY2D> ARRAY3D;
-
-/*
-extern ARRAY Bsqr_sim,bfluid0_sim,bfluid1_sim,bfluid2_sim,bfluid3_sim;
-extern ARRAY efluid0_sim,efluid1_sim,efluid2_sim,efluid3_sim;
-extern ARRAY b2_sim, e2_sim, rMKS_sim, thetaMKS_sim;;
-extern ARRAY2D COORDS;
-extern ARRAY2D PRIMS;
-*/
 
 extern ARRAY3D COORDS_BLOCKS;
 extern ARRAY3D PRIMS_BLOCKS;
@@ -96,6 +101,7 @@ void TransposeMatrix(double m[NDIM][NDIM], double minv[NDIM][NDIM]);
 std::vector <size_t> sort_indices(const std::vector <double> &v);
 
 
+void CopyArray(ARRAY &Final, const ARRAY Initial);
 void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> &data);
 void WriteVectorToNumpyArray(std::string fname, ARRAY &data);
 

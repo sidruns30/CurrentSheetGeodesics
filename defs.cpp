@@ -4,8 +4,8 @@
 
 
 // Make the map for primitives
-std::unordered_map <std::string, int> iprim =   {{"rho",0}, {"P",1},{"V1",2}, {"V2",3},{"V3",4}, {"B1",5},
-                                        {"B2",6}, {"B3",7},{"E1",8}, {"E2",9},{"E3",10}};
+//std::unordered_map <std::string, int> iprim =   {{"rho",0}, {"P",1},{"V1",2}, {"V2",3},{"V3",4}, {"B1",5},
+//                                        {"B2",6}, {"B3",7},{"E1",8}, {"E2",9},{"E3",10}};
 
 // Generic print (not sure where to place for now)
 void print(std::string out)
@@ -322,4 +322,18 @@ std::vector <size_t> sort_indices(const std::vector <double> &v)
     iota(indices.begin(), indices.end(), 0);
     stable_sort(indices.begin(), indices.end(), [&v](size_t i1, size_t i2) {return v[i1] < v[i2];});
     return indices;
+}
+
+// Copy contents of one vector into another
+void CopyArray(ARRAY &Final, const ARRAY Initial)
+{
+    size_t i, N = Initial.size();
+    Final.clear();
+    Final.reserve(N);
+
+    for(i=0; i<N; i++)
+    {
+        Final.push_back(Initial[i]);
+    }
+    return;
 }
