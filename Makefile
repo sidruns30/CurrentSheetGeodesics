@@ -1,11 +1,30 @@
-all: metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp main.cpp
-	g++-12 -o exec -O2 -std=c++17 metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp main.cpp -fopenmp
+CXX							=	g++-12
 
-debug: metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp main.cpp
-	g++-12 -o exec -O2 -std=c++17 metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp main.cpp
+INCDIRS						=	. cnpy fluid input geodesics metric
+LIBDIR						=	/usr/local/lib
+BINDIR						=	build
 
-cnpy:metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp cnpy/cnpy.cpp main.cpp
-	g++-12  -fno-common -fopenmp -o exec -O2 -std=c++17 metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp cnpy/cnpy.cpp main.cpp -fopenmp -L/usr/local/lib -lz
+DEPFLAGS					=	-MP -MD
+LDFLAGS						= 	-L$(LIBDIR)
+LDLIBS						= 	-lz
+OMPFLAGS					= 	-fopenmp
+OPTFLAGS					= 	-O3
+CXXFLAGS					=	-fno-common -Wall -Wno-unused-variable -Wno-unused-but-set-variable -std=c++17	\
+								$(foreach D,$(INCDIRS),-I$(D)) $(DEPFLAGS) $(OPTFLAGS) $(OMPFLAGS)
 
-cnpy_deb: metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp cnpy/cnpy.cpp main.cpp
-	g++-12  -fno-common -o exec -Og -std=c++17 metric/BLmetric.cpp metric/SCmetric.cpp metric/KSmetric.cpp metric/MKSmetric.cpp metric/metric.cpp fluid/getk.cpp defs.cpp geodesics/geodesic.cpp input/load_txt.cpp fluid/BHAC_MHD.cpp partition.cpp cnpy/cnpy.cpp main.cpp -L/usr/local/lib -lz
+BINARY						=	$(BINDIR)/CurrentSheetGeodesics
+SOURCES						=	$(foreach D,$(INCDIRS),$(wildcard $(D)/*.cpp))
+OBJECTS						=	$(patsubst %.cpp,%.o,$(SOURCES))
+DEPFILES					=	$(patsubst %.cpp,%.d,$(SOURCES))
+
+
+all:	$(BINARY)
+
+$(BINARY):	$(OBJECTS)
+	$(CXX) -o $@ $^ $(LDFLAGS) $(LDLIBS) $(CXXFLAGS)
+
+%.o: %.c
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+clean:
+	rm $(BINARY) $(OBJECTS) $(DEPFILES)
