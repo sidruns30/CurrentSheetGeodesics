@@ -499,10 +499,9 @@ void T_3KSTo_3Cart(double T3KS[NDIM-1], double T3Cart[NDIM-1], double XKS[NDIM])
 void T_3logKSTo3_KS(double T3logKS[NDIM-1], double T3KS[NDIM-1], double XKS[NDIM])
 {
     double r = XKS[1];
-    T3KS[0] = T3logKS[0];
-    T3KS[1] = r * T3logKS[1];
+    T3KS[0] = r * T3logKS[0];
+    T3KS[1] = T3logKS[1];
     T3KS[2] = T3logKS[2];
-    T3KS[3] = T3logKS[3];
     return;
 }
 
@@ -511,9 +510,8 @@ void T_3logKSTo3_KS(double T3logKS[NDIM-1], double T3KS[NDIM-1], double XKS[NDIM
 void T_3KSTo3_logKS(double T3KS[NDIM-1], double T3logKS[NDIM-1], double XKS[NDIM])
 {
     double r = XKS[1];
-    T3logKS[0] = T3KS[0];
-    T3logKS[1] = T3KS[1] / r;
+    T3logKS[0] = T3KS[0] / r;
+    T3logKS[1] = T3KS[1];
     T3logKS[2] = T3KS[2];
-    T3logKS[3] = T3KS[3];
     return;
 }
