@@ -12,10 +12,10 @@
 extern const bool idealMHD;
 
 // Set the other fluid quantities to be computed
-extern ARRAY   blfuid0, bfluid1, bfluid2, bfluid3,
-        Bsqr, b2, u0, u1, u2, u3, beta, sigma,
-        efluid0, efluid1, efluid2, efluid3, Esqr,
-        e2, temp;
+//extern ARRAY   blfuid0, bfluid1, bfluid2, bfluid3,
+//        Bsqr, b2, u0, u1, u2, u3, beta, sigma,
+//        efluid0, efluid1, efluid2, efluid3, Esqr,
+//        e2, temp;
 
 
 // Return global fluid quantities
