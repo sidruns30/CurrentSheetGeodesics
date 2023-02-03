@@ -10,7 +10,7 @@ LDLIBS						= 	-lz
 OMPFLAGS					= 	-fopenmp
 OPTFLAGS					= 	-O3
 CXXFLAGS					=	-fno-common -Wall -Wno-unused-variable -Wno-unused-but-set-variable -std=c++17	\
-								$(foreach D,$(INCDIRS),-I$(D)) $(DEPFLAGS) $(OPTFLAGS) $(OMPFLAGS)
+								$(foreach D,$(INCDIRS),-I$(D)) $(DEPFLAGS) $(OPTFLAGS) #$(OMPFLAGS)
 
 BINARY						=	$(BINDIR)/CurrentSheetGeodesics
 SOURCES						=	$(foreach D,$(INCDIRS),$(wildcard $(D)/*.cpp))
