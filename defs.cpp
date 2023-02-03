@@ -337,3 +337,29 @@ void CopyArray(ARRAY &Final, const ARRAY Initial)
     }
     return;
 }
+
+// Append one vector into another
+void AppendArray(ARRAY &Final, const ARRAY Initial)
+{
+    Final.insert(Final.end(), Initial.begin(), Initial.end());
+    return;
+}
+
+// Print the max, mean and the mean of an array for debugging
+void GetArrayInfo(std::string arrname, const ARRAY &data)
+{
+    size_t i, N = data.size();
+    double min=DBL_MAX, max=DBL_MIN, mean = 0;
+    for (i=0; i<N; i++)
+    {
+        max = std::max(max, data[i]);
+        min = std::min(min, data[i]);
+        mean += data[i];
+    }
+    mean /= static_cast<double>(N);
+    std::cout   <<"Min, max and mean for " << arrname <<" are : "<< min << ""
+                ", "<< max << ", " << mean << std::endl;
+    std::cout<< "First two elements are" << data[0] << ", " << data[1] << std::endl;
+
+    return;
+}

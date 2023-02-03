@@ -102,8 +102,11 @@ std::vector <size_t> sort_indices(const std::vector <double> &v);
 
 
 void CopyArray(ARRAY &Final, const ARRAY Initial);
+void AppendArray(ARRAY &Final, const ARRAY Initial);
 void WriteVectorToFile(std::string fname, std::vector <std::vector <double>> &data);
 void WriteVectorToNumpyArray(std::string fname, ARRAY &data);
+void GetArrayInfo(std::string arrname, const ARRAY &data);
+
 
 // For debugging
 template <typename T>
