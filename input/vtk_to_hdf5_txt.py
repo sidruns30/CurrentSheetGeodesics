@@ -72,12 +72,14 @@ def ConvertToText(data:np.ndarray, array_names:list):
     Convert vtk to vtu
     Takes multiple fnames for each array and a dir for where
     the files are located
+    Option to append numpy arrays
 """
 def vtkTovtu(fnames, dir, outname="test.vtu"):
     print("Converting vtk to vtu...")
     import meshio
 
     point_data = {}
+    print("Writing vtk data")
     for file in fnames:
         loc = dir + file
         mesh = meshio.read(loc, file_format="vtk")
@@ -101,14 +103,43 @@ def vtkTovtu(fnames, dir, outname="test.vtu"):
     cells = mesh.cells # suspicious -- do all arrays have the same cells?
     del mesh
     mesh = meshio.Mesh(points=points, cells=cells, point_data=point_data)
-    mesh.write(outname)
+    #mesh.write(outname)
     print("done")
+    print("cells are", cells)
+    return cells
+
+"""
+    Convert numpy arrays into vtu
+"""
+def npzTovtu(dir, arrnames, cells, outname="test_calc.vtu"):
+    print("Converting npy data to vtu")
+    # Firt need to rearrange cells based on sorted elements
+    point_data = {}
+    points = [0, 0, 0]
+    # First append existing numpy arrays if present
+    for arr in arrnames:
+        loc = dir + arr + ".npy"
+        data = np.load(loc)
+        print("length of ", arr, " is ", len(data))
+        if arr == "x" :
+            points[0] = data
+        elif arr == "y":
+            points[1] = data
+        elif arr == "z":
+            points[2] = data
+        else:
+            point_data[arr] = data
+    import meshio
+    points = np.array(points, dtype=float).T
+    mesh = meshio.Mesh(points=points, point_data=point_data, cells=cells)
+    mesh.write(outname)
+    del mesh
     return
 
 """
     Covert vtk to npz arrays
 """
-def vtkTonpz(fnames, dir, outname="test.npz"):
+def vtkTonpz(fnames, dir, outdir):
     print("Converting vtk to npz")
     import meshio
 
@@ -130,24 +161,48 @@ def vtkTonpz(fnames, dir, outname="test.npz"):
         # append arrays into npz arrays
         for key, value in mesh.point_data.items():
             if file == "Bcart_reduced212_9537n0.vtk":
-                b1 = value[:,0]
-                b2 = value[:,1]
-                b3 = value[:,2]
+                b1 = value[:,0].reshape(-1)
+                b2 = value[:,1].reshape(-1)
+                b3 = value[:,2].reshape(-1)
             elif file == "vcart_reduced212_9537n0.vtk":
-                u1 = value[:,0]
-                u2 = value[:,1]
-                u3 = value[:,2]
+                u1 = value[:,0].reshape(-1)
+                u2 = value[:,1].reshape(-1)
+                u3 = value[:,2].reshape(-1)
             elif file == "p_reduced212_9537n0.vtk":
-                p = value[:]
+                p = value[:].reshape(-1)
             elif file == "Rho_reduced212_9537n0.vtk":
-                rho = value[:]
+                rho = value[:].reshape(-1)
         
     x = mesh.points[:,0]
     y = mesh.points[:,1]
     z = mesh.points[:,2]
 
-    np.savez(outname, x=x, y=y, z=z, p=p, rho=rho, u1=u1, 
-                u2=u2, u3=u3, b1=b1, b2=b2, b3=b3)
+    # Set the same data type before saving
+    x.astype(np.float64)
+    y.astype(np.float64)
+    z.astype(np.float64)
+    u1.astype(np.float64)
+    u2.astype(np.float64)
+    u3.astype(np.float64)
+    b1.astype(np.float64)
+    b2.astype(np.float64)
+    b3.astype(np.float64)
+    p.astype(np.float64)
+    rho.astype(np.float64)
+
+
+    np.save(outdir + "/x.npy", x)
+    np.save(outdir + "/y.npy", y)
+    np.save(outdir + "/z.npy", z)
+    np.save(outdir + "/rho.npy", rho)
+    np.save(outdir + "/p.npy", p)
+    np.save(outdir + "/u1.npy", u1)
+    np.save(outdir + "/u2.npy", u2)
+    np.save(outdir + "/u3.npy", u3)
+    np.save(outdir + "/b1.npy", b1)
+    np.save(outdir + "/b2.npy", b2)
+    np.save(outdir + "/b3.npy", b3)
+
     return
 
 def main():
@@ -155,8 +210,9 @@ def main():
     datadir = "/Users/siddhant/research/bh-flare/data/lightcurve/"
     fnames =    ["p_reduced212_9537n0.vtk", "Bcart_reduced212_9537n0.vtk", 
             "Rho_reduced212_9537n0.vtk", "vcart_reduced212_9537n0.vtk"]
-    vtkTonpz(fnames=fnames, dir=datadir, outname="test.npz")
-
+    vtkTonpz(fnames=fnames, dir=datadir, outdir="npy_data")
+    #cells = vtkTovtu(fnames, datadir, "test.vtu")
+    #npzTovtu(dir="", arrnames=["x", "y", "z", "u0", "rho", "beta", "bsqr", "sigma"], cells=cells)
     #fname = "/Users/siddhant/research/bh-flare/data/data_convert0303.vtu"
     #outname="test.vtu"
     #array_names = ["u1", "u2", "u3", "b1", "b2", "b3", 
