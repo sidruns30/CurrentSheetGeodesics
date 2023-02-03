@@ -16,7 +16,7 @@ extern const bool idealMHD;
 // Return global fluid quantities
 namespace HAMR_MHD
 {
-    void Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &bfluid3, 
+    void Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &bfluid3, ARRAY &b2,
                     ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, 
                     const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
 
@@ -28,9 +28,6 @@ namespace HAMR_MHD
 
     void GetBsqr(ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
     void GetEsqr(ARRAY &Esqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
-    
-    void Getb2(ARRAY &b2, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
-    void Gete2(ARRAY &e2, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
     
     void GetTemp(ARRAY &temp, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);    
     void GetSigma(ARRAY &sigma, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK);
