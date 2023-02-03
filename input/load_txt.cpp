@@ -102,18 +102,34 @@ void InitializeArrays(ARRAY2D &COORDS, ARRAY2D &PRIMS,
 }
 
 // Void initialize single numpy array and store it in a vector
-void LoadNumpyArray(std::string fname, std::string arrname, ARRAY &vec)
+void LoadNumpyArray(std::string dirname, std::string arrname, ARRAY &vec)
 {
+    std::string path = dirname + "/" + arrname + ".npy";
     std::cout<<"Loading array "<<arrname<<std::endl;
     cnpy::NpyArray *parray = new cnpy::NpyArray;
-    *parray = cnpy::npz_load(fname, arrname);
+    *parray = cnpy::npy_load(path);
     size_t i, nelements = parray->shape[0];
+    size_t word_size = parray->word_size, float32=4;
     vec.reserve(nelements);
-    double *data = parray->data<double>();
-    for (i=0; i<nelements; i++)
+    if (word_size == float32)
     {
-        vec.push_back(data[i]);
+        float *fdata = parray->data<float>();
+        for (i=0; i<nelements; i++)
+        {
+            vec.push_back(static_cast<double>(fdata[i]));
+        }
+
     }
+    else
+    {
+        double *data = parray->data<double>();
+        for (i=0; i<nelements; i++)
+        {
+            vec.push_back(static_cast<double>(data[i]));
+        }
+    }
+
+    GetArrayInfo(arrname, vec);
     delete parray;
     return;
 }
@@ -128,14 +144,14 @@ void InitializeNumpyArrays(ARRAY2D &COORDS, ARRAY2D &PRIMS, std::string fname)
     LoadNumpyArray(fname, "x", x);
     LoadNumpyArray(fname, "y", y);
     LoadNumpyArray(fname, "z", z);
+    LoadNumpyArray(fname, "rho", rho);
+    LoadNumpyArray(fname, "P", p);
     LoadNumpyArray(fname, "u1", u1);
     LoadNumpyArray(fname, "u2", u2);
     LoadNumpyArray(fname, "u3", u3);
     LoadNumpyArray(fname, "b1", b1);
     LoadNumpyArray(fname, "b2", b2);
     LoadNumpyArray(fname, "b3", b3);
-    LoadNumpyArray(fname, "rho", rho);
-    LoadNumpyArray(fname, "p", p);
 
     // Push back data to global arrays    
     COORDS.push_back(x);
