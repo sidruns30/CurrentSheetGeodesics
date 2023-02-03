@@ -25,7 +25,7 @@ void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
     y = COORDS[1];
     ARRAY phi;
 
-    size_t i, j, N = x.size();
+    int i, j, N = x.size();
 
     // Populate phi
     for (i=0; i<N; i++)
