@@ -47,9 +47,9 @@ void HAMR_MHD::GetU(ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3,
 
         // Finally the four velocities
         double _u0 = _lfac / alpha;
-        double _u1 = _lfac * (vi_con[0] - beta_con[0] / alpha);     
-        double _u2 = _lfac * (vi_con[1] - beta_con[1] / alpha);     
-        double _u3 = _lfac * (vi_con[2] - beta_con[2] / alpha);     
+        double _u1 = _lfac * (vi_con[0] - beta_con[0] / alpha);
+        double _u2 = _lfac * (vi_con[1] - beta_con[1] / alpha);
+        double _u3 = _lfac * (vi_con[2] - beta_con[2] / alpha);
 
         // Sanity check for the dot product
         double u_con[NDIM] = {_u0, _u1, _u2, _u3};
@@ -127,7 +127,8 @@ void HAMR_MHD::GetSigma(ARRAY &sigma, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, 
 
     for (i=0; i<N; i++)
     {
-        sigma.push_back(Bsqr[i] / PRIMS_BLOCK[iRHO][i]);
+        double _sigma = Bsqr[i] / PRIMS_BLOCK[iRHO][i];
+        sigma.push_back(_sigma);
     }
 
     return;
@@ -149,7 +150,77 @@ void HAMR_MHD::GetBeta(ARRAY &beta, ARRAY &Bsqr, const ARRAY2D &COORDS_BLOCK, co
 
     for (i=0; i<N; i++)
     {
-        beta.push_back(PRIMS_BLOCK[iP][i] / Bsqr[i]);
+        double _beta = PRIMS_BLOCK[iP][i] / Bsqr[i];
+        beta.push_back(_beta);
     }    
+    return;
+}
+
+void HAMR_MHD::Getbfluid(ARRAY &bfluid0, ARRAY &bfluid1, ARRAY &bfluid2, ARRAY &bfluid3, ARRAY &b2,
+                    ARRAY &u0, ARRAY &u1, ARRAY &u2, ARRAY &u3, 
+                    const ARRAY2D &COORDS_BLOCK, const ARRAY2D &PRIMS_BLOCK)
+{
+    print("Computing bfluid");
+    size_t i, N = COORDS_BLOCK[0].size();
+
+    bfluid0.clear();
+    bfluid1.clear();
+    bfluid2.clear();
+    bfluid3.clear();
+
+    // Check if the 4 velocities arrays are pre computed
+    if ((u0.size()!=N) || (u1.size()!=N) || (u2.size()!=N) || (u3.size()!=N))
+    {
+        GetU(u0, u1, u2, u3, COORDS_BLOCK, PRIMS_BLOCK);
+    }
+
+    else
+    {
+        for(i=0; i<N; i++)
+        {
+            double x = COORDS_BLOCK[0][i], y = COORDS_BLOCK[1][i], z = COORDS_BLOCK[2][i];
+
+            // Get KS coordinates
+            double XKS[NDIM];
+            CartToKS(x, y, z, XKS);
+
+            // Get the KS arrays for B and V
+            double Vinp[NDIM-1] = {PRIMS_BLOCK[iVX][i], PRIMS_BLOCK[iVY][i], PRIMS_BLOCK[iVZ][i]};
+            double Binp[NDIM-1] = {PRIMS_BLOCK[iBX][i], PRIMS_BLOCK[iBY][i], PRIMS_BLOCK[iBZ][i]};
+
+            double vi_con[NDIM-1], vi_cov[NDIM-1];
+            double Bi_con[NDIM-1];
+
+            // Cartesian to spherical Kerr Schild
+            T_3CartTo3_KS(Vinp, vi_con, XKS);
+            T_3CartTo3_KS(Binp, Bi_con, XKS);
+            UpperToLower3(2, XKS, vi_con, vi_cov);
+
+            // Now the metric matrices
+            double gcov[NDIM][NDIM];
+            double gcon[NDIM][NDIM];
+            GcovFunc(2, XKS, gcov);
+            GconFunc(2, XKS, gcon);
+
+            double alpha = sqrt(-1/gcon[0][0]);
+            double _lfac = alpha * u0[i];
+
+            double BdotV = Bi_con[0]*vi_cov[0] + Bi_con[1]*vi_cov[1] + Bi_con[2]*vi_cov[2];
+            double _bfluid0 = _lfac * BdotV / alpha;
+            double _bfluid1 = (Bi_con[0] + alpha * _bfluid0 * u1[i]) / _lfac;
+            double _bfluid2 = (Bi_con[1] + alpha * _bfluid0 * u2[i]) / _lfac;
+            double _bfluid3 = (Bi_con[2] + alpha * _bfluid0 * u3[i]) / _lfac;
+
+            double _b_con[NDIM] = {_bfluid0, _bfluid1, _bfluid2, _bfluid3}, _b_cov[NDIM];
+            UpperToLower(2, XKS, _b_con, _b_cov);
+            double _b2 = _b_con[0]*_b_cov[0] + _b_con[1]*_b_cov[1] + _b_con[2]*_b_cov[2] + _b_con[3]*_b_cov[3];
+
+            bfluid0.push_back(_bfluid0);
+            bfluid1.push_back(_bfluid1);
+            bfluid2.push_back(_bfluid2);
+            bfluid3.push_back(_bfluid3);
+            b2.push_back(_b2);
+        }
+    }
     return;
 }
