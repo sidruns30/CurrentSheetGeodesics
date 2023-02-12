@@ -39,11 +39,17 @@ void PartitionGrid(ARRAY2D &COORDS, ARRAY2D &PRIMS)
     // Only sort in phi when openmp is enabled
     std::vector <size_t> phi_indices(phi.size());
     #if defined(_OPENMP)
-        phi_indices = sort_indices(phi);
     #else
+        COORDS_BLOCKS.push_back(COORDS);
+        PRIMS_BLOCKS.push_back(PRIMS);
+        COORDS.clear();
+        PRIMS.clear();
         iota(phi_indices.begin(), phi_indices.end(), 0);
+        std::cout << "Program not called with OpenMP, skipping partition " << std::endl;
+        return;
     #endif
 
+    phi_indices = sort_indices(phi);
     // Partition based on resources
     const int block_size = N / maxthreads;
     const int extra_cells = N % maxthreads;
