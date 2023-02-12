@@ -129,7 +129,7 @@ void LoadNumpyArray(std::string dirname, std::string arrname, ARRAY &vec)
         }
     }
 
-    GetArrayInfo(arrname, vec);
+    //GetArrayInfo(arrname, vec);
     delete parray;
     return;
 }

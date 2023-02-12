@@ -170,7 +170,7 @@ def vtkTonpz(fnames, dir, outdir):
                 u3 = value[:,2].reshape(-1)
             elif file == "p_reduced212_9537n0.vtk":
                 p = value[:].reshape(-1)
-            elif file == "Rho_reduced212_9537n0.vtk":
+            elif file == "Rho_reduced212_91_9537n0.vtk":
                 rho = value[:].reshape(-1)
         
     x = mesh.points[:,0]
@@ -205,14 +205,27 @@ def vtkTonpz(fnames, dir, outdir):
 
     return
 
+"""
+    Make an array of zeros if a certain prim vtk
+    array is not available
+"""
+def makezeros(goodarray, loc):
+    # open good array to get the size of the array
+    shape = np.load(goodarray).shape
+    p = np.zeros(shape)
+    np.save(loc, p)
+    return
+
 def main():
     # first load the vtk and make a vtu
-    datadir = "/Users/siddhant/research/bh-flare/data/lightcurve/"
-    fnames =    ["p_reduced212_9537n0.vtk", "Bcart_reduced212_9537n0.vtk", 
-            "Rho_reduced212_9537n0.vtk", "vcart_reduced212_9537n0.vtk"]
-    vtkTonpz(fnames=fnames, dir=datadir, outdir="npy_data")
-    #cells = vtkTovtu(fnames, datadir, "test.vtu")
-    #npzTovtu(dir="", arrnames=["x", "y", "z", "u0", "rho", "beta", "bsqr", "sigma"], cells=cells)
+    datadir = "/Users/siddhant/research/bh-flare/data/highresdata/"
+    fnames =    ["Rho_reduced212_91_9537n0.vtk"]#, "vcart_reduced212_9537n0.vtk", 
+                #"Bcart_reduced212_9537n0.vtk"]
+            # "p_reduced212_9537n0.vtk", "Bcart_reduced212_9537n0.vtk", 
+    #vtkTonpz(fnames=fnames, dir=datadir, outdir="npy_data")
+    #makezeros("npy_data/rho.npy", "npy_data/p.npy")
+    cells = vtkTovtu(fnames, datadir, "test.vtu")
+    npzTovtu(dir="", arrnames=["b2", "x", "y", "z", "u0", "rho", "beta", "bsqr", "sigma"], cells=cells)
     #fname = "/Users/siddhant/research/bh-flare/data/data_convert0303.vtu"
     #outname="test.vtu"
     #array_names = ["u1", "u2", "u3", "b1", "b2", "b3", 
